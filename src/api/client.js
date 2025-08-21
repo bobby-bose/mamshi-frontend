@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const REACT_API="http://localhost:4000"
+const REACT_API="http://3.107.193.29:4000"
 
 const baseURL =
  REACT_API +
