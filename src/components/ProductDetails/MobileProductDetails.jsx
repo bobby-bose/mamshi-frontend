@@ -8,7 +8,6 @@ import {
   getSimilarProducts,
   newReview,
 } from "../../actions/productAction";
-import { addItemsToCart } from "../../actions/cartAction";
 import {
   addToWishlist,
   removeFromWishlist,
@@ -20,16 +19,13 @@ import {
 } from "../../utils/functions";
 import Loader from "../Layouts/Loader";
 import MetaData from "../Layouts/MetaData";
-
-// Icons
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FlashOnIcon from "@mui/icons-material/FlashOn";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import CachedIcon from "@mui/icons-material/Cached";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import axios from "axios";
+import Button from "@mui/material/Button";
 import client from "../../api/client";
 
 const MobileProductDetails = () => {
@@ -38,6 +34,7 @@ const MobileProductDetails = () => {
  const { id } = useParams(); 
  const productId = id; // Assuming the product ID is passed as a URL parameter
   const navigate = useNavigate();
+  const [size, setSize] = useState(""); // <-- new state for size
   const mobileNumber = sessionStorage.getItem("mobileNumber");
 
   const [open, setOpen] = useState(false);
@@ -60,16 +57,39 @@ const MobileProductDetails = () => {
 
   // Handlers
   const addToCartHandler = async () => {
-   
-  await client.post(`/wishlist/${id}/${mobileNumber}`, {
-            
-        }).then((response) => {
-            console.log("Product added to wishlist:", response.data);
-        }).catch((error) => {
-            console.error("Error adding product to wishlist:", error);
-        });
-     enqueueSnackbar("Product Added To Cart", { variant: "success" });
+    if (!size) {
+      enqueueSnackbar("⚠️ Please select a size before adding to cart", {
+        variant: "warning",
+        autoHideDuration: 3000,
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+        style: {
+          backgroundColor: "#ff9800",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          borderRadius: "8px",
+        },
+      });
+      return;
     }
+try {
+      await client.post(`/wishlist/${id}/${mobileNumber}`, { size });
+      enqueueSnackbar("✅ Product Added To Cart", {
+        variant: "success",
+        autoHideDuration: 2500,
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+        style: {
+          backgroundColor: "#4caf50",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          borderRadius: "8px",
+        },
+      });
+    } catch (error) {
+      enqueueSnackbar("❌ Failed to add product to cart", { variant: "error" });
+    }
+  };
 
    
 
@@ -196,18 +216,26 @@ console.log("API Raw:", response.data);
                 </>
               )}
             </div>
-
+<div className="mt-4 flex gap-4">
+        {["Small", "Medium", "Large"].map((s) => (
+          <Button
+            key={s}
+            variant={size === s ? "contained" : "outlined"}
+            color={size === s ? "primary" : "inherit"}
+            onClick={() => setSize(s)}
+            sx={{
+              borderRadius: "20px",
+              textTransform: "none",
+              fontWeight: "bold",
+            }}
+          >
+            {s}
+          </Button>
+        ))}
+      </div>
             {/* Stock + Buttons */}
             <div className="flex gap-3 mt-4">
-              {/* {data.stock > 0 && (
-                <button
-                  onClick={itemInCart ? goToCart : addToCartHandler}
-                  className="p-4 w-1/2 flex items-center justify-center gap-2 text-white bg-yellow-500 rounded shadow hover:shadow-lg"
-                >
-                  <ShoppingCartIcon />
-                  {itemInCart ? "GO TO CART" : "ADD TO CART"}
-                </button>
-              )} */}
+           
              
                 <button
                   onClick={ addToCartHandler}
@@ -254,10 +282,7 @@ console.log("API Raw:", response.data);
                   <CachedIcon className="text-blue-500" fontSize="small" />
                   7 Days Replacement Policy
                 </li>
-                <li className="flex items-center gap-2">
-                  <CurrencyRupeeIcon className="text-blue-500" fontSize="small" />
-                  Cash on Delivery available
-                </li>
+             
               </ul>
             </div>
           </div>

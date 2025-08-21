@@ -70,26 +70,7 @@ const MobileProducts = () => {
         });
     };
 
-    const clearFilters = () => {
-        setPrice([0, 2000]);
-        setSelectedSizes([]);
-    };
-
-    const applyFilters = () => {
-        let tempProducts = [...initialProducts];
-
-        tempProducts = tempProducts.filter(
-            (product) => product.Price >= price[0] && product.Price <= price[1]
-        );
-
-        if (selectedSizes.length > 0) {
-            tempProducts = tempProducts.filter((product) => {
-                return selectedSizes.some(size => product[size]);
-            });
-        }
-        
-        setFilteredProducts(tempProducts);
-    };
+   
 
     useEffect(() => {
         const fetchAllProducts = async () => {
@@ -100,7 +81,7 @@ const MobileProducts = () => {
                 const products = response.data.products;
                 console.log("Fetched Products:", products);
                 setInitialProducts(products);
-                setFilteredProducts(products);
+             
             } catch (err) {
                 console.error("Failed to fetch products:", err);
                 setError("Failed to fetch products.");
@@ -113,7 +94,7 @@ const MobileProducts = () => {
     }, []);
 
     useEffect(() => {
-        applyFilters();
+        
     }, [price, selectedSizes]);
 
     useEffect(() => {
@@ -175,67 +156,7 @@ const MobileProducts = () => {
             <main className="w-full font-[Inter,sans-serif] text-stone sm:mt-0" style={{ marginTop: "100px" }}>
                 <div className="flex flex-col sm:flex-row gap-3 mt-2 sm:mt-2 sm:mx-3 m-auto mb-7">
 
-                    {/* Filters */}
-                    <div className="w-full sm:w-1/5 px-1">
-                        <div className="flex flex-col bg-white rounded-sm shadow">
-                            <div className="flex items-center justify-between gap-5 px-4 py-2 border-b">
-                                <p className="text-xl font-medium">Filters</p>
-                                <button className="uppercase text-white bg-darkGray-600 text-lg cursor-pointer 
-                                
-                                px-2 py-1 rounded-md hover:bg-darkGray-700 transition-colors duration-300"
-                                 onClick={clearFilters}>clear all</button>
-                            </div>
-                            <div className="flex flex-col gap-2 py-3 text-sm overflow-hidden">
-                                {/* Price Filter */}
-                                <div className="flex flex-col gap-2 border-b px-4">
-                                   
-                                    <Slider
-                                        value={price}
-                                        onChange={priceHandler}
-                                        valueLabelDisplay="auto"
-                                        getAriaLabel={() => 'Price range slider'}
-                                        min={0}
-                                        max={2000}
-                                    />
-                                    <div className="flex gap-3 items-center justify-between mb-2 min-w-full">
-                                        <span className="flex-1 border px-4 py-1 rounded-sm bg-gray-50">₹{price[0].toLocaleString()}</span>
-                                        <span className="font-medium text-darkGray-400">to</span>
-                                        <span className="flex-1 border px-4 py-1 rounded-sm bg-gray-50">₹{price[1].toLocaleString()}</span>
-                                    </div>
-                                </div>
-
-                                {/* Sizes Filter */}
-                                <div className="flex flex-col border-b px-4">
-                                    <div className="flex justify-between cursor-pointer py-2 pb-4 items-center" onClick={() => setSizesToggle(!sizesToggle)}>
-                                      
-                                        {sizesToggle ? <ExpandLessIcon sx={{ fontSize: "20px" }} /> : <ExpandMoreIcon sx={{ fontSize: "20px" }} />}
-                                    </div>
-                                    {sizesToggle && (
-                                        <div className="flex flex-col pb-1">
-                                            <FormControl component="fieldset">
-                                                <FormGroup>
-                                                    {['S', 'M', 'L', 'XL'].map((size, i) => (
-                                                        <FormControlLabel
-                                                            key={i}
-                                                            control={
-                                                                <Checkbox 
-                                                                    size="small" 
-                                                                    value={size}
-                                                                    checked={selectedSizes.includes(size)}
-                                                                    onChange={handleSizeChange}
-                                                                />
-                                                            }
-                                                            label={<span className="text-sm">{size}</span>}
-                                                        />
-                                                    ))}
-                                                </FormGroup>
-                                            </FormControl>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+          
 
                     {/* Product List */}
                     <div className="flex-1">
@@ -243,7 +164,7 @@ const MobileProducts = () => {
                             <Loader />
                         ) : (
                             <>
-                                {filteredProducts?.length === 0 ? (
+                                {initialProducts?.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center gap-3 bg-white shadow-sm rounded-sm p-6 sm:p-16">
                                         <img draggable="false" className="w-1/2 h-44 object-contain" src="https://static-assets-web.flixcart.com/www/linchpin/fk-cp-zion/img/error-no-search-results_2353c5.png" alt="Search Not Found" />
                                         <h1 className="text-2xl font-medium">Sorry, no results found!</h1>
@@ -251,7 +172,7 @@ const MobileProducts = () => {
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4 justify-center items-start w-full bg-white p-2 sm:p-4">
-                                        {filteredProducts?.map((product) => (
+                                        {initialProducts?.map((product) => (
                                             <div key={product._id} className="flex flex-col gap-2 p-2 border rounded-md">
                                                 <ProductImageSlider images={[product.main, product.sub]} />
                                                 <div>
@@ -265,8 +186,7 @@ const MobileProducts = () => {
                     {product.XL && <SizeButton size='XL' isAvailable={product.XL} color='white' bgColor='rgba(50, 13, 197, 1)' />}
                 </div>
                  {/* Product details button with a nice hover eefect and light greyish transiitona nd slow animation woth grey , blur and slight dark red color */}
- {/* {`/product/${_id}`}  */}
-<h1>{product._id}</h1>
+
  <Link to={`/product/${product._id}`}>
  <button className="mt-2  
  text-white px-4 py-2 rounded-lg hover:bg-blue transition-colors duration-300"
