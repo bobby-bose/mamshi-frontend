@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const baseURL =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) ||
-  process.env.REACT_APP_API_URL ||
-  "/api/v1"; // fallback if using Netlify proxy
+const REACT_API="http://localhost:4000"
 
+const baseURL =
+ REACT_API +
+  "/api/v1"; // fallback if using Netlify proxy
+console.log("The frontend URL is",baseURL);
 const client = axios.create({
   baseURL,
   withCredentials: true, // needed if backend uses cookies

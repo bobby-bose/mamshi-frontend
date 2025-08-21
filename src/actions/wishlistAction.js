@@ -1,10 +1,9 @@
 import axios from "axios";
 import { ADD_TO_WISHLIST, REMOVE_FROM_WISHLIST } from "../constants/wishlistConstants";
-import HOST from '../constants/constant';
-import PORT from '../constants/constant';
+import client from "../api/client";
 // Add To Wishlist
 export const addToWishlist = (id, mobileNumber) => async (dispatch, getState) => {
-    const response = await axios.post(`http://localhost:4000/api/v1/wishlist/${id}/${mobileNumber}`);
+    const response = await client.post(`/wishlist/${id}/${mobileNumber}`);
     console.log("Product added to wishlist:", response.data);
 }
      

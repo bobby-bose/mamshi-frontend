@@ -30,8 +30,6 @@ import CachedIcon from "@mui/icons-material/Cached";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import axios from "axios";
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';  
 import client from "../../api/client";
 
 const MobileProductDetails = () => {

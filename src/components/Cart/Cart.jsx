@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';  
+import axios from "axios"; 
+import client from "../../api/client";
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
 const navigate = useNavigate();
@@ -17,7 +16,7 @@ if (!mobileNumber) {
   navigate("/login");
 }
   useEffect(() => {
-    axios.get(`http://localhost:4000/api/v1/wishlist`)
+    client.get(`/wishlist`)
       .then(async (response) => {
         const items = response.data.wishlistItems;
 
@@ -30,8 +29,8 @@ if (!mobileNumber) {
         const enrichedItems = await Promise.all(
           userItems.map(async (item) => {
             const [productRes, userRes] = await Promise.all([
-              axios.get(`http://localhost:4000/api/v1/product/${item.productId}`),
-              axios.get(`http://localhost:4000/api/v1/me/${item.mobileNumber}`)
+              client.get(`/product/${item.productId}`),
+              client.get(`/me/${item.mobileNumber}`)
             ]);
 
             return {
@@ -132,9 +131,9 @@ if (!mobileNumber) {
               <button
                 className="w-full sm:w-auto bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-darkGray-600"
                 onClick={() => {
-                  axios
+                  client
                     .delete(
-                      `http://localhost:4000/api/v1/wishlist/${item._id}`
+                      `/wishlist/${item._id}`
                     )
                     .then(() => {
                       console.log("Item removed from wishlist");

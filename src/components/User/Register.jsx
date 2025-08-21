@@ -11,8 +11,6 @@ import { clearErrors, registerUser } from '../../actions/userAction';
 import BackdropLoader from '../Layouts/BackdropLoader';
 import MetaData from '../Layouts/MetaData';
 import FormSidebar from './FormSidebar';
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';
 const Register = () => {
 
     const dispatch = useDispatch();

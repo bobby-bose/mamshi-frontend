@@ -27,8 +27,6 @@ import { getDeliveryDate, getDiscount } from '../../utils/functions';
 import { addToWishlist, removeFromWishlist } from '../../actions/wishlistAction';
 import MinCategory from '../Layouts/MinCategory';
 import MetaData from '../Layouts/MetaData';
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';  
 const ProductDetails = () => {
 
 

@@ -9,8 +9,7 @@ import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { logoutUser } from '../../actions/userAction';
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';
+
 const Sidebar = ({ activeTab }) => {
 
     const dispatch = useDispatch();

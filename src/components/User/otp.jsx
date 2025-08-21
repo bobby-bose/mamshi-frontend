@@ -7,8 +7,7 @@ import { useSnackbar } from 'notistack';
 import BackdropLoader from '../Layouts/BackdropLoader';
 import MetaData from '../Layouts/MetaData';
 import axios from 'axios';
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';
+
 import client from '../../api/client';
 const Otp = () => {
   const dispatch = useDispatch();

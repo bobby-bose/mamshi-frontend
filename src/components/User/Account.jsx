@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import Sidebar from './Sidebar';
 import { Link, useNavigate } from 'react-router-dom';
 import MetaData from '../Layouts/MetaData';
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';
+import client from '../../api/client';
 
 const Account = () => {
   const navigate = useNavigate();
@@ -28,59 +27,63 @@ const Account = () => {
     }));
   };
 
-  const fetchUserDetails = async () => {
-    try {
-      const res = await fetch(`http://localhost:4000/api/v1/me/${mobileNumber}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      });
-      const data = await res.json();
-      console.log("User Details:", data);
-      if (res.ok) {
-        setFormData({
-          firstName: data.user.name.split(" ")[0],
-          lastName: data.user.name.split(" ")[1] || "",
-          gender: data.user.gender || "",
-          mobileNumber: data.user.mobileNumber || "",
-          email: data.user.email || "",
-          address: data.user.address || ""
-        });
-      } else {
-        alert("❌ Error fetching user details: " + data.message);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to fetch user details");
-    }
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-       const updatedData = {
-    ...formData,
-    name: formData.firstName + " " + formData.lastName
-  };
-      const res = await fetch(`http://localhost:4000/api/v1/me/${mobileNumber}`, 
-        {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData)
-      });
 
-      const data = await res.json();
-      if (res.ok) {
-        alert("✅ Profile updated successfully!");
-      } else {
-        alert("❌ Error: " + data.message);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to update profile");
+const fetchUserDetails = async () => {
+  try {
+    const res = await client.get(`/me/${mobileNumber}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("User Details:", res.data);
+
+    const data = res.data;
+    setFormData({
+      firstName: data.user.name.split(" ")[0],
+      lastName: data.user.name.split(" ")[1] || "",
+      gender: data.user.gender || "",
+      mobileNumber: data.user.mobileNumber || "",
+      email: data.user.email || "",
+      address: data.user.address || "",
+    });
+    
+  } catch (err) {
+    console.error(err);
+    const message = err.response?.data?.message || err.message || "Unknown error";
+    alert("❌ Failed to fetch user details: " + message);
+  }
+};
+
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const updatedData = {
+      ...formData,
+      name: formData.firstName + " " + formData.lastName,
+    };
+
+    const res = await client.put(`/me/${mobileNumber}`, updatedData, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (res.status === 200) {
+      alert("✅ Profile updated successfully!");
+    } else {
+      alert("❌ Error: " + res.data.message);
     }
-  };
+
+  } catch (err) {
+    console.error(err);
+    const message = err.response?.data?.message || err.message || "Unknown error";
+    alert("❌ Failed to update profile: " + message);
+  }
+};
+
 
   useEffect(() => {
     if (!mobileNumber) {

@@ -8,8 +8,7 @@ import BackdropLoader from '../Layouts/BackdropLoader';
 import MetaData from '../Layouts/MetaData';
 import axios from 'axios';
 import navigate from 'react-router-dom';
-import HOST from '../../constants/constant';
-import PORT from '../../constants/constant';
+
 const Login = () => {
 
     const dispatch = useDispatch();

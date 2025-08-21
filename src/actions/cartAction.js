@@ -1,5 +1,6 @@
 import axios from "axios"
 import { ADD_TO_CART, EMPTY_CART, REMOVE_FROM_CART, SAVE_SHIPPING_INFO } from "../constants/cartConstants";
+import client from "../api/client";
 
 
 export const addItemsToCart = (id ) => async (dispatch, getState) => {
@@ -10,7 +11,7 @@ export const addItemsToCart = (id ) => async (dispatch, getState) => {
     const mobileNumber = sessionStorage.getItem('mobileNumber');
     console.log("Adding item to cart with ID:", id, "and mobile number:", mobileNumber);
     if (mobileNumber) {
-        await axios.post(`http://localhost:4000/api/v1/wishlist/${id}/${mobileNumber}`, {
+        await client.post(`/wishlist/${id}/${mobileNumber}`, {
             
         }).then((response) => {
             console.log("Product added to wishlist:", response.data);
