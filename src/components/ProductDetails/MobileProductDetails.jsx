@@ -31,11 +31,12 @@ import client from "../../api/client";
 const MobileProductDetails = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
- const { id } = useParams(); 
- const productId = id; // Assuming the product ID is passed as a URL parameter
+  const { id } = useParams();
+  const productId = id;
   const navigate = useNavigate();
-  const [size, setSize] = useState(""); // <-- new state for size
+  const [size, setSize] = useState("");
   const mobileNumber = sessionStorage.getItem("mobileNumber");
+  const [availableSizes, setAvailableSizes] = useState([]);
 
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
@@ -72,7 +73,8 @@ const MobileProductDetails = () => {
       });
       return;
     }
-try {
+    try {
+      // Pass the full size name to the backend
       await client.post(`/wishlist/${id}/${mobileNumber}`, { size });
       enqueueSnackbar("✅ Product Added To Cart", {
         variant: "success",
@@ -90,11 +92,6 @@ try {
       enqueueSnackbar("❌ Failed to add product to cart", { variant: "error" });
     }
   };
-
-   
-
-
-
 
   const goToCart = () => navigate("/cart");
 
@@ -114,44 +111,62 @@ try {
   };
 
   // Effects
- useEffect(() => {
-  console.log("Product ID:", productId);
-  const fetchProduct = async () => {
-    try {
-      console.log("Fetching product details for ID:", productId);
-      const response = await client.get(`/product/${productId}`);
-      console.log("Product Details Data:", response.data);
-console.log("API Raw:", response.data);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await client.get(`/product/${productId}`);
+        const productData = response.data.productDetails;
+        setData(productData);
 
-      // Your API returns { success: true, productDetails: {...} }
-      setData(response.data.productDetails);
-    } catch (err) {
-      console.error("Error fetching product:", err);
+        // Dynamically create the available sizes array with full names
+        const sizes = [];
+        if (productData.S) sizes.push("Small");
+        if (productData.M) sizes.push("Medium");
+        if (productData.L) sizes.push("Large");
+        if (productData.XL) sizes.push("Extra Large");
+        setAvailableSizes(sizes);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+      }
+    };
+
+    fetchProduct();
+
+    if (error) {
+      enqueueSnackbar(error, { variant: "error" });
+      dispatch(clearErrors());
     }
-  };
-
-  fetchProduct();
-
-  if (error) {
-    enqueueSnackbar(error, { variant: "error" });
-    dispatch(clearErrors());
-  }
-  if (reviewError) {
-    enqueueSnackbar(reviewError, { variant: "error" });
-    dispatch(clearErrors());
-  }
-  if (success) {
-    enqueueSnackbar("Review Submitted Successfully", { variant: "success" });
-    dispatch({ type: NEW_REVIEW_RESET });
-  }
-
-}, [dispatch, productId, error, reviewError, success, enqueueSnackbar]);
+    if (reviewError) {
+      enqueueSnackbar(reviewError, { variant: "error" });
+      dispatch(clearErrors());
+    }
+    if (success) {
+      enqueueSnackbar("Review Submitted Successfully", { variant: "success" });
+      dispatch({ type: NEW_REVIEW_RESET });
+    }
+  }, [dispatch, productId, error, reviewError, success, enqueueSnackbar]);
 
   useEffect(() => {
-    if (product?.category) {
+    if (data?.category) {
       dispatch(getSimilarProducts(data.category));
     }
-  }, [dispatch, product?.category]);
+  }, [dispatch, data?.category]);
+
+  // Helper function to get color based on size (using full names)
+  const getSizeColor = (s) => {
+    switch (s.toLowerCase()) {
+      case "small":
+        return "#ad1d13ff"; // Red
+      case "medium":
+        return "#125f15ff"; // Green
+      case "large":
+        return "#154267ff"; // Blue
+      case "extra large":
+        return "#342019ff"; // Brown
+      default:
+        return "#c3259bff"; // Default to black or another neutral color
+    }
+  };
 
   if (loading) return <Loader />;
 
@@ -178,8 +193,6 @@ console.log("API Raw:", response.data);
                 style={{ height: "400px" }}
               />
             </div>
-
-            {/* Wishlist */}
             <button
               onClick={toggleWishlist}
               className={`mt-4 p-2 rounded-full shadow ${
@@ -216,53 +229,48 @@ console.log("API Raw:", response.data);
                 </>
               )}
             </div>
-<div className="mt-4 flex gap-4">
-        {["Small", "Medium", "Large"].map((s) => (
-          <Button
-            key={s}
-            variant={size === s ? "contained" : "outlined"}
-            color={size === s ? "primary" : "inherit"}
-            onClick={() => setSize(s)}
-            sx={{
-              borderRadius: "20px",
-              textTransform: "none",
-              fontWeight: "bold",
-            }}
-          >
-            {s}
-          </Button>
-        ))}
-      </div>
+
+            {/* Size Options (Dynamic) */}
+            {availableSizes.length > 0 && (
+              <div className="mt-4 flex gap-4" 
+              style={{flexDirection: "column"}}>
+                {availableSizes.map((s) => (
+                  <Button
+                    key={s}
+                    variant={size === s ? "contained" : "outlined"}
+                    onClick={() => setSize(s)}
+                    sx={{
+                      borderRadius: "10px",
+                      textTransform: "none",
+                      borderWidth: "3px",
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      borderColor: getSizeColor(s),
+                      color: size === s ? "white" : getSizeColor(s),
+                      backgroundColor: size === s ? getSizeColor(s) : "transparent",
+                      "&:hover": {
+                        backgroundColor: getSizeColor(s),
+                        color: "white",
+                        opacity: 0.8,
+                      },
+                    }}
+                  >
+                    {s}
+                  </Button>
+                ))}
+              </div>
+            )}
+
             {/* Stock + Buttons */}
             <div className="flex gap-3 mt-4">
-           
-             
-                <button
-                  onClick={ addToCartHandler}
-                  className="p-4 w-full flex items-center justify-center gap-2 text-white bg-blue-800 rounded shadow hover:shadow-lg"
-                >
-                  <ShoppingCartIcon />
-                  "ADD TO CART"
-                </button>
-           
-           
-             
+              <button
+                onClick={addToCartHandler}
+                className="p-4 w-full flex items-center justify-center gap-2 text-white bg-blue-800 rounded shadow hover:shadow-lg"
+              >
+                <ShoppingCartIcon />
+                ADD TO CART
+              </button>
             </div>
-
-            {/* Offers */}
-            <p className="text-md font-medium mt-4">Available offers</p>
-            {Array(3)
-              .fill("")
-              .map((_, i) => (
-                <p className="text-sm flex items-center gap-2" key={i}>
-                  <LocalOfferIcon className="text-green-600" fontSize="small" />
-                  <span className="font-medium">Bank Offer</span> 15% Instant
-                  discount on first Slouch Pay Later order of 500 and above{" "}
-                  <Link className="text-blue-500 font-medium" to="/">
-                    T&C
-                  </Link>
-                </p>
-              ))}
 
             {/* Delivery */}
             <div className="flex gap-16 mt-4 text-sm font-medium">
@@ -282,7 +290,6 @@ console.log("API Raw:", response.data);
                   <CachedIcon className="text-blue-500" fontSize="small" />
                   7 Days Replacement Policy
                 </li>
-             
               </ul>
             </div>
           </div>
@@ -291,6 +298,5 @@ console.log("API Raw:", response.data);
     </div>
   );
 }
-
 
 export default MobileProductDetails;

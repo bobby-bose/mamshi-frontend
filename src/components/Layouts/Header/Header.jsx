@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+
 const Header = () => {
 
   const user = sessionStorage.getItem('mobileNumber') || '' || '';
@@ -17,6 +18,13 @@ const Header = () => {
 
   const [togglePrimaryDropDown, setTogglePrimaryDropDown] = useState(false);
 
+const whatsappNumber = '916360461032'; // Replace with your desired number, including the country code
+
+  // This function constructs the WhatsApp URL and opens it in a new tab
+  const handleWhatsAppClick = () => {
+    const url = `https://wa.me/${whatsappNumber}`;
+    window.open(url, '_blank');
+  };
 
   return (
 
@@ -51,9 +59,16 @@ const Header = () => {
  
   
 
-       
-            <Link to="/login" className="px-3 sm:px-9 py-0.5 text-primary-blue bg-white border font-medium rounded-sm cursor-pointer">Login</Link>
-          
+  { !user && (
+    <Link to="/login" className="px-3 sm:px-9 py-0.5 text-primary-blue bg-white border font-medium rounded-sm cursor-pointer">Login</Link>
+)}
+              <div
+              className="text-green cursor-pointer hover:scale-105 transition-transform duration-200   
+  flex justify-center items-center"
+              onClick={handleWhatsAppClick}
+            >
+         <i className="fa fa-whatsapp" style={{ fontSize: "35px", color: "green",fontWeight:'bolder' }}></i>
+            </div>
           <div className="relative flex items-center">
   <span
     className="userDropDown flex items-center text-white font-medium gap-1 cursor-pointer"

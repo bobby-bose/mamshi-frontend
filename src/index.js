@@ -6,6 +6,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
 import { SnackbarProvider } from 'notistack';
+import 'font-awesome/css/font-awesome.min.css'; // Import Font Awesome for WhatsApp icon
 
 ReactDOM.render(
   <React.StrictMode>

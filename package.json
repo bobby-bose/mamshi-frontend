@@ -2,8 +2,6 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-
-
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
@@ -16,6 +14,7 @@
     "axios": "^0.25.0",
     "chart.js": "^3.7.0",
     "flipkart": "file:..",
+    "font-awesome": "^4.7.0",
     "notistack": "^2.0.3",
     "react": "^17.0.2",
     "react-chartjs-2": "^4.0.1",
@@ -60,6 +59,7 @@
     ]
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"
