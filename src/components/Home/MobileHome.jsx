@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import MetaData from '../Layouts/MetaData';
 import MobilePromoBanner from './Banner/MobileBanner';
 import MobileDealSlider from './DealSlider/MobileDealSlider';
+import CounterBanner from '../Home/Banner/top';
 
 const MobileHome = () => {
   const dispatch = useDispatch();
@@ -22,11 +23,13 @@ const MobileHome = () => {
 
   return (
     <>
+
       <MetaData title="Shop on Mobile - Mobiles, Electronics, Grocery & More!" />
 
       <main className="flex flex-col gap-2 px-3 mt-14 sm:mt-4">
         {/* Banner Section */}
         <div className="w-full h-70 sm:h-50">
+               <CounterBanner />
           <MobilePromoBanner  />
         </div>
 
@@ -36,7 +39,7 @@ const MobileHome = () => {
         <div className="w-full my-2">
           <MobileDealSlider title="Trending Deals for You" />
         </div>
-
+    
         {/* Product Slider */}
        
       </main>

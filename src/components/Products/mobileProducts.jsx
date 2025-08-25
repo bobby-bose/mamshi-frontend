@@ -14,6 +14,7 @@ import MetaData from '../Layouts/MetaData';
 import client from '../../api/client';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import CounterBanner from '../Home/Banner/top';
 
 const SizeButton = ({ size, isAvailable, color, bgColor }) => {
     // Determine the class names based on availability
@@ -153,6 +154,7 @@ const MobileProducts = () => {
     return (
         <>
             <MetaData title="All Products" />
+        
             <main className="w-full font-[Inter,sans-serif] text-stone sm:mt-0" style={{ marginTop: "100px" }}>
                 <div className="flex flex-col sm:flex-row gap-3 mt-2 sm:mt-2 sm:mx-3 m-auto mb-7">
 

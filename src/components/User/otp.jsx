@@ -9,6 +9,7 @@ import MetaData from '../Layouts/MetaData';
 import axios from 'axios';
 
 import client from '../../api/client';
+import CounterBanner from '../Home/Banner/top';
 const Otp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -18,16 +19,12 @@ const Otp = () => {
   const { loading, isAuthenticated, error } = useSelector((state) => state.user);
 
   const [otp, setOtp] = useState("");
-  const mobileNumber = sessionStorage.getItem("mobileNumber");
+  const email = sessionStorage.getItem("mobileNumber");
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // ✅ Step 1: Check OTP value
-    if (otp !== "000") {
-      enqueueSnackbar("Invalid OTP. Please trhhhhy again.", { variant: "error" });
-      return;
-    }
+
 
     try {
       // ✅ Step 2: Call backend API to verify OTP
@@ -37,7 +34,7 @@ const Otp = () => {
 
       const { data, status } = await client.post(
         `/verify-otp`,
-        { mobileNumber,otp }, // you can also include mobileNumber if required
+        { email,otp }, // you can also include mobileNumber if required
         config
       );
 
@@ -74,6 +71,7 @@ const Otp = () => {
       <MetaData title="Otp | Slouch" />
 
       {loading && <BackdropLoader />}
+      <CounterBanner />
       <main className="w-full mt-12 sm:pt-20 sm:mt-0">
         <div className="flex sm:w-4/6 sm:mt-4 m-auto mb-7 bg-white shadow-lg">
           <div className="loginSidebar bg-gray-700 p-10 pr-12 hidden sm:flex flex-col gap-4 w-2/5">

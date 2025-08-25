@@ -29,19 +29,19 @@ const whatsappNumber = '916360461032'; // Replace with your desired number, incl
   return (
 
     <header className="
-    // i need a dark grey background
+
     bg-gray-700
-     fixed top-0 py-2.5 w-full z-10">
+     top-0 py-2.5 w-full z-10" style={{height: "60px"}}>
 
       {/* <!-- navbar container --> */}
-      <div className="w-full flex justify-between items-center relative" style={{
+      <div className="w-full flex justify-between  relative" style={{
         // padding to left and right at once
         paddingLeft: "20px",
         paddingRight: "20px"
       }}>
 
         {/* <!-- logo & search container --> */}
-        <div className="flex items-center flex-1 items-center justify-between">
+        <div className="flex  flex-1 justify-between">
           <Link className="h-7 mr-1 sm:mr-4" to="/">
             <img draggable="false" src={logo} alt="Slouch Logo"
             style={{
@@ -64,14 +64,14 @@ const whatsappNumber = '916360461032'; // Replace with your desired number, incl
 )}
               <div
               className="text-green cursor-pointer hover:scale-105 transition-transform duration-200   
-  flex justify-center items-center"
+  flex justify-center "
               onClick={handleWhatsAppClick}
             >
          <i className="fa fa-whatsapp" style={{ fontSize: "35px", color: "green",fontWeight:'bolder' }}></i>
             </div>
-          <div className="relative flex items-center">
+          <div className="relative flex">
   <span
-    className="userDropDown flex items-center text-white font-medium gap-1 cursor-pointer"
+    className="userDropDown flex text-white font-medium gap-1 cursor-pointer"
     onClick={() => setTogglePrimaryDropDown(!togglePrimaryDropDown)}
   >
     {user}
@@ -94,7 +94,7 @@ const whatsappNumber = '916360461032'; // Replace with your desired number, incl
 </div>
 
 
-          <Link to="/cart" className="flex items-center text-white font-medium gap-2 relative">
+          <Link to="/cart" className="flex text-white font-medium gap-2 relative">
             <span><ShoppingCartIcon /></span>
             {cartItems.length > 0 &&
               <div className="w-5 h-5 p-2 bg-gray-700 text-xs rounded-full absolute -top-2 left-3 flex justify-center items-center border">

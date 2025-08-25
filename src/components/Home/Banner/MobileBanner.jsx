@@ -40,23 +40,16 @@ export default function MobilePromoBanner() {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row w-full gap-4 p-2">
+    <div className="p-2 justify-center items-center">
       {/* Left - Banner */}
-      <div className="w-full md:w-[60%] flex justify-center items-center bg-gray-100 rounded-2xl shadow-lg p-2">
+      <div className="w-full bg-gray-100 rounded-2xl shadow-lg p-2">
         <img
           src={banner}
           alt="Promo Banner"
-          className="w-[90%] h-auto rounded-2xl shadow-md"
+          className=" h-auto rounded-2xl shadow-md"
         />
       </div>
 
-      {/* Right - Live Users Count */}
-      <div className="w-full md:w-[40%] flex flex-col justify-center items-center bg-blue-900 text-white p-6 md:p-10 rounded-2xl shadow-lg text-center">
-        <h1 className="text-2xl md:text-5xl font-bold mb-4">🔥 Hurry up!!!</h1>
-        <p className="text-xl md:text-4xl">
-          {usersCount} users have purchased till now 🚀
-        </p>
-      </div>
     </div>
   );
 }

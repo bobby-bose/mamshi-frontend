@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Slider from 'react-slick';
 import { Link } from 'react-router-dom';
 import Product from './Product';
 import client from '../../../api/client';
-
-// Import slick CSS (must be included for react-slick to work)
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 
 const MobileDealSlider = ({ title }) => {
   const [products, setProducts] = useState([]);
@@ -15,8 +9,7 @@ const MobileDealSlider = ({ title }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await client.get('/products'); // change API if needed
-        console.log('Fetched products:', data.products);
+        const { data } = await client.get('/products');
         setProducts(data.products || []);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -25,33 +18,6 @@ const MobileDealSlider = ({ title }) => {
 
     fetchProducts();
   }, []);
-
-  // Slider settings for auto-play
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 2000,           // transition speed (ms)
-    slidesToShow: 2,       // Show 2 products at a time
-    slidesToScroll: 1,
-    autoplay: true,        // enable auto sliding
-    autoplaySpeed: 2500,   // wait time before next slide (ms)
-    cssEase: "linear",     // makes sliding continuous
-    arrows: false,         // hide navigation buttons
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-        },
-      },
-    ],
-  };
 
   return (
     <section className="bg-white w-full shadow overflow-hidden">
@@ -68,16 +34,16 @@ const MobileDealSlider = ({ title }) => {
 
       <hr />
 
-      {/* Products slider */}
+      {/* Products Grid */}
       {products.length > 0 ? (
-        <div className="px-4 py-4">
-          <Slider {...settings}>
+        <div className="p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((item, i) => (
-              <div key={item._id || i} className="px-2">
+              <div key={item._id || i}>
                 <Product {...item} />
               </div>
             ))}
-          </Slider>
+          </div>
         </div>
       ) : (
         <p className="text-center py-5">No products found.</p>

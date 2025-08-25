@@ -41,6 +41,7 @@ import MobileProducts from './components/Products/mobileProducts';
 import MobileProductDetails from './components/ProductDetails/MobileProductDetails';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import CounterBanner from './components/Home/Banner/top';
 
 
 
@@ -78,6 +79,7 @@ function App() {
   
   return (
     <>
+    <CounterBanner />
       <Header />
       <Routes>
         <Route path="/" element={<MobileHome />} />

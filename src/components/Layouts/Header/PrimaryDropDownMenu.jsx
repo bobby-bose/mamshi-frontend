@@ -32,32 +32,11 @@ const PrimaryDropDownMenu = ({ setTogglePrimaryDropDown, user }) => {
 
     const navs = [
         
-        {
-            title: "Carts",
-            icon: <ShoppingBagIcon sx={{ fontSize: "18px" }} />,
-            redirect: "/cart",
-        },
-        
-      
-        {
-            title: "Coupons",
-            icon: <ConfirmationNumberIcon sx={{ fontSize: "18px" }} />,
-            redirect: "/",
-        },
-        {
-            title: "Gift Cards",
-            icon: <AccountBalanceWalletIcon sx={{ fontSize: "18px" }} />,
-            redirect: "/",
-        },
-        {
-            title: "Notifications",
-            icon: <NotificationsIcon sx={{ fontSize: "18px" }} />,
-            redirect: "/",
-        },
+     
     ]
 
     return (
-        <div className="absolute w-60 -left-24 ml-2 top-9 bg-white shadow-2xl rounded flex-col text-sm">
+       <div className="absolute left-1/2 top-9 transform -translate-x-1/2 w-60 bg-white shadow-2xl rounded flex-col text-sm z-50">
 
             {user.role === "admin" &&
                 <Link className="pl-3 py-3.5 border-b flex gap-3 items-center hover:bg-gray-50 rounded-t" to="/admin/dashboard">

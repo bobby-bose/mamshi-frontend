@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import client from "../../api/client";
-import CounterBanner from "../Home/Banner/top";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
@@ -34,8 +33,6 @@ export default function Wishlist() {
               ...item,
               product: productRes.data,
               user: userRes.data,
-              // Add a quantity field to each item, default to 1
-              quantity: 1, 
             };
           })
         );
@@ -47,38 +44,9 @@ export default function Wishlist() {
       });
   }, [mobileNumber]);
 
-  // Handle quantity change for a specific item
-  const handleQuantityChange = (itemId, change) => {
-    setWishlist(prevWishlist =>
-      prevWishlist.map(item =>
-        item._id === itemId
-          ? { ...item, quantity: Math.max(1, item.quantity + change) } // Ensure quantity is at least 1
-          : item
-      )
-    );
-  };
-
-  // Calculate the total price of all items in the wishlist
-  const totalPrice = wishlist.reduce((total, item) => {
-    const price = item.product?.productDetails?.Price || 0;
-    const quantity = item.quantity || 1; 
-    return total + price * quantity;
-  }, 0);
-
-  // Handle the single "Buy Now" button click
-  const handleBuyAll = () => {
-    sessionStorage.setItem("totalPrice", totalPrice);
-    const orderItems = wishlist.map(item => ({
-      productId: item.productId,
-      quantity: item.quantity,
-    }));
-    sessionStorage.setItem("orderItems", JSON.stringify(orderItems));
-    navigate("/checkout");
-  };
-
   return (
-    <>   
-    <div className="p-4 bg-gray-50 min-h-screen mt-[20px]">
+    <div className="p-4 bg-gray-50 min-h-screen mt-[50px]">
+      <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">My Cart</h2>
 
       {wishlist.length === 0 ? (
         <p className="text-stone text-center">Your cart is empty.</p>
@@ -112,33 +80,49 @@ export default function Wishlist() {
 
                 {/* Sizes */}
                 <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="text-lg font-semibold">
-                    {item.size}
+                  {/* Display the size chosen by the user from the item object */}
+                  <span className="border px-2 py-1 text-lg rounded-md bg-green-800 text-white font-semibold">
+                  {item.size}
                   </span>
                 </div>
 
-                {/* Quantity Counter */}
-                <div className="flex items-center mt-3">
-                  <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1">
-                    <button onClick={() => handleQuantityChange(item._id, -1)} className="text-gray-500 hover:text-gray-800 text-lg font-bold">-</button>
-                    <span className="mx-3 text-sm font-semibold">{item.quantity}</span>
-                    <button onClick={() => handleQuantityChange(item._id, 1)} className="text-gray-500 hover:text-gray-800 text-lg font-bold">+</button>
-                  </div>
-                </div>
-
                 {/* User Info */}
-                <div className="mt-3 text-lg text-stone" style={{fontWeight: "bold"}}>
+                <div className="mt-3 text-sm text-stone">
                   Ordered by:{" "}
-                  <span className="font-large" style={{fontWeight: "bold"}}> {item.user?.user?.mobileNumber}</span>
+                  <span className="font-medium">{item.user?.user?.name}</span>{" "}
                   <br />
-                 
+                  Mobile:{" "}
+                  <span className="font-medium">
+                    {item.user?.user?.mobileNumber}
+                  </span>
                 </div>
               </div>
 
-              {/* Actions - The "Remove" button remains */}
+              {/* Actions */}
               <div className="mt-4 sm:mt-0 sm:ml-4 flex sm:flex-col gap-2">
                 <button
-                  className="w-full sm:w-auto bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-600"
+                  className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+                  onClick={() => {
+                    sessionStorage.setItem(
+                      "productName",
+                      item.product?.productDetails?.Name
+                    );
+                    sessionStorage.setItem(
+                      "productDescription",
+                      item.product?.productDetails?.Description
+                    );
+                    client.post("/orders/productId/mobilenumber", {
+                      productId: item.product?._id,
+                      mobileNumber: item.user?.user?.mobileNumber
+                    });
+                    navigate("/checkout");
+                    
+                  }}
+                >
+                  Buy Now
+                </button>
+                <button
+                  className="w-full sm:w-auto bg-gray-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-darkGray-600"
                   onClick={() => {
                     client
                       .delete(`/wishlist/${item._id}`)
@@ -163,30 +147,6 @@ export default function Wishlist() {
           ))}
         </div>
       )}
-      
-      {/* New Section for Total Price and Buy All Items Button */}
-      {wishlist.length > 0 && (
-       <div className="mt-8 p-6 bg-white rounded-2xl shadow-lg flex justify-between items-center">
-  {/* Left side → Button */}
-  <button
-    className="bg-darkGray text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
-    onClick={handleBuyAll}
-  >
-    Buy All Items
-  </button>
-
-  {/* Right side → Total Price */}
-  <div className="flex flex-col items-end">
-    <span className="text-xl font-bold">Total Price:</span>
-    <span className="text-2xl font-extrabold text-blue-600">
-      ₹{totalPrice.toFixed(2)}
-    </span>
-  </div>
-</div>
-
-      )}
     </div>
-    </>
-
   );
 }

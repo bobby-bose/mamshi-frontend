@@ -13,20 +13,14 @@ import {
   removeFromWishlist,
 } from "../../actions/wishlistAction";
 import { NEW_REVIEW_RESET } from "../../constants/productConstants";
-import {
-  getDeliveryDate,
-  getDiscount,
-} from "../../utils/functions";
+import { getDeliveryDate, getDiscount } from "../../utils/functions";
 import Loader from "../Layouts/Loader";
 import MetaData from "../Layouts/MetaData";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
-import CachedIcon from "@mui/icons-material/Cached";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import Button from "@mui/material/Button";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from "react-responsive-carousel";
 import client from "../../api/client";
+import MobileProductDetailsSub from "./MobileProductDetailsSub";
+import CounterBanner from "../Home/Banner/top";
 
 const MobileProductDetails = () => {
   const dispatch = useDispatch();
@@ -37,12 +31,8 @@ const MobileProductDetails = () => {
   const [size, setSize] = useState("");
   const mobileNumber = sessionStorage.getItem("mobileNumber");
   const [availableSizes, setAvailableSizes] = useState([]);
-
-  const [open, setOpen] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState("");
-
   const [data, setData] = useState({});
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const { product, loading, error } = useSelector(
     (state) => state.productDetails
@@ -56,49 +46,67 @@ const MobileProductDetails = () => {
   const itemInWishlist = wishlistItems.some((i) => i.product === productId);
   const itemInCart = cartItems.some((i) => i.product === productId);
 
-  // Handlers
+  // Check if the device is mobile
+  const [isMobile, setIsMobile] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const allImages = data ? [data.main, data.sub] : [];
+
   const addToCartHandler = async () => {
     if (!size) {
       enqueueSnackbar("⚠️ Please select a size before adding to cart", {
         variant: "warning",
-        autoHideDuration: 3000,
-        anchorOrigin: { vertical: "top", horizontal: "center" },
-        style: {
-          backgroundColor: "#ff9800",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          borderRadius: "8px",
-        },
       });
       return;
     }
     try {
-      // Pass the full size name to the backend
       await client.post(`/wishlist/${id}/${mobileNumber}`, { size });
       enqueueSnackbar("✅ Product Added To Cart", {
         variant: "success",
-        autoHideDuration: 2500,
-        anchorOrigin: { vertical: "top", horizontal: "center" },
-        style: {
-          backgroundColor: "#4caf50",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: "16px",
-          borderRadius: "8px",
-        },
       });
     } catch (error) {
       enqueueSnackbar("❌ Failed to add product to cart", { variant: "error" });
     }
   };
 
-  const goToCart = () => navigate("/cart");
+  const buyNow = async () => {
+  if (!size) {
+    enqueueSnackbar("⚠️ Please select a size before proceeding to checkout", {
+      variant: "warning",
+    });
+    return; // stop if no size selected
+  }
+var totalPrice= data.Price * quantity;
+  try {
+    // First, add product to cart/order DB
+    await client.post("/orders/productId/mobilenumber", {
+      productId: id,
+      mobileNumber,
+      size,
+      quantity,
+    
+    });
 
-  const buyNow = () => {
-    addToCartHandler();
-    navigate("/cart");
-  };
+    sessionStorage.setItem("totalPrice", totalPrice);
+
+    // Now navigate to checkout with total price
+    navigate("/checkout", {
+    
+    });
+  } catch (error) {
+    enqueueSnackbar("❌ Failed to place order", { variant: "error" });
+  }
+};
+
 
   const toggleWishlist = () => {
     if (itemInWishlist) {
@@ -110,20 +118,24 @@ const MobileProductDetails = () => {
     }
   };
 
-  // Effects
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await client.get(`/product/${productId}`);
         const productData = response.data.productDetails;
         setData(productData);
-
-        // Dynamically create the available sizes array with full names
         const sizes = [];
-        if (productData.S) sizes.push("Small");
-        if (productData.M) sizes.push("Medium");
-        if (productData.L) sizes.push("Large");
-        if (productData.XL) sizes.push("Extra Large");
+        if (productData.XS) sizes.push("XS");
+        if (productData.S) sizes.push("S");
+        if (productData.M) sizes.push("M");
+        if (productData.L) sizes.push("L");
+        if (productData.XL) sizes.push("XL");
+        if (productData.XXL) sizes.push("XXL");
+        if (productData.thxL) sizes.push("3XL");
+        if (productData.foxL) sizes.push("4XL");
+        if (productData.fixL) sizes.push("5XL");
+        if (productData.sixL) sizes.push("6XL");
+        if (productData.sexL) sizes.push("7XL");
         setAvailableSizes(sizes);
       } catch (err) {
         console.error("Error fetching product:", err);
@@ -152,151 +164,265 @@ const MobileProductDetails = () => {
     }
   }, [dispatch, data?.category]);
 
-  // Helper function to get color based on size (using full names)
-  const getSizeColor = (s) => {
-    switch (s.toLowerCase()) {
-      case "small":
-        return "#ad1d13ff"; // Red
-      case "medium":
-        return "#125f15ff"; // Green
-      case "large":
-        return "#154267ff"; // Blue
-      case "extra large":
-        return "#342019ff"; // Brown
-      default:
-        return "#c3259bff"; // Default to black or another neutral color
+  const clearSelection = () => {
+    setSize("");
+  };
+
+  const handleQuantityChange = (type) => {
+    if (type === "increment") {
+      setQuantity((prev) => prev + 1);
+    } else if (type === "decrement" && quantity > 1) {
+      setQuantity((prev) => prev - 1);
     }
   };
 
   if (loading) return <Loader />;
 
   return (
-    <div className="p-6">
+    <>
+
+    <div className="p-4 bg-gray-50 font-sans w-full">
       <MetaData title={data.Name} />
-      <main className="mt-12 sm:mt-0">
-        <div className="w-full flex flex-col sm:flex-row bg-white p-4 rounded-lg shadow-md">
-          {/* Left Section - Images */}
-          <div className="w-full sm:w-1/2 flex flex-col items-center">
-            <div className="flex gap-3">
-              <img
-                draggable="false"
-                className="w-1/2 object-contain"
-                src={data.main}
-                alt={data.Name}
-                style={{ height: "400px" }}
-              />
-              <img
-                draggable="false"
-                className="w-1/2 object-contain"
-                src={data.sub}
-                alt={data.Name}
-                style={{ height: "400px" }}
-              />
-            </div>
-            <button
-              onClick={toggleWishlist}
-              className={`mt-4 p-2 rounded-full shadow ${
-                itemInWishlist ? "text-red-500" : "text-darkGray-400 hover:text-red-500"
-              }`}
-            >
-              <FavoriteIcon />
-            </button>
+      <div className="max-w-8xl mx-auto bg-white rounded-3xl shadow-xl p-6 md:p-10 my-10">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Product Image Section */}
+          <div className="w-full md:w-1/2 flex flex-col items-center">
+            {isMobile ? (
+              <div className="w-full">
+                <Carousel
+                  showArrows={false}
+                  showStatus={false}
+                  showThumbs={false}
+                  infiniteLoop={true}
+                  autoPlay={false}
+                >
+                  {allImages.map((img, index) => (
+                    <div key={index}>
+                      <img
+                        src={img}
+                        alt={`Product image ${index + 1}`}
+                        className="w-full h-auto object-cover rounded-3xl"
+                      />
+                    </div>
+                  ))}
+                </Carousel>
+              </div>
+            ) : (
+              <div className="flex w-full gap-4">
+                <div className="w-1/4 flex flex-col gap-2">
+                  {allImages.map((img, index) => (
+                    <img
+                      key={index}
+                      src={img}
+                      alt={`Thumbnail ${index + 1}`}
+                      className={`w-full h-auto object-cover rounded-xl cursor-pointer ${
+                        currentImageIndex === index
+                          ? "border-2 border-black"
+                          : ""
+                      }`}
+                      onClick={() => setCurrentImageIndex(index)}
+                    />
+                  ))}
+                </div>
+                <div className="w-3/4">
+                  <img
+                    src={allImages[currentImageIndex]}
+                    alt={`Product view ${currentImageIndex + 1}`}
+                    className="w-full h-auto object-cover rounded-3xl"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Right Section - Details */}
-          <div className="flex-1 py-2 px-4">
-            <h2 className="text-3xl font-semibold text-stone tracking-wide mb-2">
-              {data.Name}
-            </h2>
-            <p className="text-md text-darkGray-700 mb-3">{data.Description}</p>
+          {/* Product Info Section */}
+          <div className="w-full md:w-1/2 relative">
+            <button
+              onClick={toggleWishlist}
+              className={`absolute top-0 right-0 p-2 rounded-full shadow ${
+                itemInWishlist ? "text-red-500" : "text-gray-400 hover:text-red-500"
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-8 w-8"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+              Absolutely Sober Oversized Tee
+            </h1>
 
-            {/* Price */}
-            <span className="text-primary-green text-sm font-medium">
-              Special Price
-            </span>
-            <div className="flex items-baseline gap-2 text-3xl font-medium mb-2">
-              <span className="text-stone">
+            {/* Price & Reviews */}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-gray-500 line-through text-lg">
                 ₹{data.Price?.toLocaleString()}
               </span>
-              {data.Price && (
-                <>
-                  <span className="text-base text-stone line-through">
-                    ₹{data.Price?.toLocaleString()}
-                  </span>
-                  <span className="text-base text-primary-green">
-                    {getDiscount(data.Price, data.Price)}% off
-                  </span>
-                </>
-              )}
+              <span className="text-2xl font-bold text-gray-900">
+                ₹{data.Price?.toLocaleString()}
+              </span>
+              <span className="text-yellow-400 ml-4">★ ★ ★ ★ ☆</span>
+              <span className="ml-2 text-gray-500">(0 reviews)</span>
             </div>
 
-            {/* Size Options (Dynamic) */}
+            <p className="flex items-center text-gray-600 text-sm mb-6">
+              <span className="mr-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </span>
+              29 people are viewing this right now
+            </p>
+
+            {/* Color Selection */}
+            <div className="mb-6">
+              <h4 className="text-md font-semibold text-gray-800 mb-2">
+                Color: Beige
+              </h4>
+              <div className="flex gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-gray-900 bg-[#C6A28C] cursor-pointer"></div>
+                <div className="w-10 h-10 rounded-full bg-yellow-400 cursor-pointer"></div>
+                <div className="w-10 h-10 rounded-full bg-orange-500 cursor-pointer"></div>
+              </div>
+            </div>
+
+            {/* Size Selection */}
             {availableSizes.length > 0 && (
-              <div className="mt-4 flex gap-4" 
-              style={{flexDirection: "column"}}>
-                {availableSizes.map((s) => (
-                  <Button
-                    key={s}
-                    variant={size === s ? "contained" : "outlined"}
-                    onClick={() => setSize(s)}
-                    sx={{
-                      borderRadius: "10px",
-                      textTransform: "none",
-                      borderWidth: "3px",
-                      fontSize: "20px",
-                      fontWeight: "bold",
-                      borderColor: getSizeColor(s),
-                      color: size === s ? "white" : getSizeColor(s),
-                      backgroundColor: size === s ? getSizeColor(s) : "transparent",
-                      "&:hover": {
-                        backgroundColor: getSizeColor(s),
-                        color: "white",
-                        opacity: 0.8,
-                      },
-                    }}
+              <div className="mb-6">
+                <h4 className="text-md font-semibold text-gray-800 mb-2">
+                  Size: {size || "Choose a size"}
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {availableSizes.map((s) => (
+                    <button
+                      key={s}
+                      className={`border px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        size === s
+                          ? "bg-black text-white"
+                          : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+                      }`}
+                      onClick={() => setSize(s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-2 flex items-center justify-start text-sm text-gray-600 gap-2">
+                  <button
+                    className="flex items-center hover:underline"
+                    onClick={clearSelection}
                   >
-                    {s}
-                  </Button>
-                ))}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="w-4 h-4 mr-1"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Clear
+                  </button>
+                 
+                </div>
               </div>
             )}
 
-            {/* Stock + Buttons */}
-            <div className="flex gap-3 mt-4">
+            {/* Quantity and Action Buttons */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <h4 className="text-md font-semibold text-gray-800">
+                  Quantity
+                </h4>
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    className="p-2 w-10 text-gray-600"
+                    onClick={() => handleQuantityChange("decrement")}
+                  >
+                    -
+                  </button>
+                  <input
+                    type="text"
+                    value={quantity}
+                    readOnly
+                    className="w-12 text-center text-gray-800 border-x border-gray-300 focus:outline-none"
+                  />
+                  <button
+                    className="p-2 w-10 text-gray-600"
+                    onClick={() => handleQuantityChange("increment")}
+                  >
+                    +
+                  </button>
+                </div>
+                <button
+                  className="flex-1 bg-white border border-gray-300 text-gray-900 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors"
+                  onClick={addToCartHandler}
+                >
+                  Add to cart
+                </button>
+              </div>
+
               <button
-                onClick={addToCartHandler}
-                className="p-4 w-full flex items-center justify-center gap-2 text-white bg-blue-800 rounded shadow hover:shadow-lg"
+                className="w-full bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors"
+                onClick={buyNow}
               >
-                <ShoppingCartIcon />
-                ADD TO CART
+                Buy Now
               </button>
             </div>
 
-            {/* Delivery */}
-            <div className="flex gap-16 mt-4 text-sm font-medium">
-              <p className="text-stone">Delivery</p>
-              <span>Delivery by {getDeliveryDate()}</span>
-            </div>
-
-            {/* Services */}
-            <div className="flex gap-16 mt-4 items-start text-sm">
-              <p className="text-stone font-medium">Services</p>
-              <ul className="flex flex-col gap-2">
-                <li className="flex items-center gap-2">
-                  <VerifiedUserIcon className="text-blue-500" fontSize="small" />
-                  {data.warranty} Year Warranty
-                </li>
-                <li className="flex items-center gap-2">
-                  <CachedIcon className="text-blue-500" fontSize="small" />
-                  7 Days Replacement Policy
-                </li>
-              </ul>
+            {/* Other Options and Delivery */}
+          
+          
+            <div className="flex items-center gap-2 text-gray-600 text-sm mt-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.25 18L18 8.25m-18 0l1.5-1.5m10.5 10.5L9.75 21"
+                />
+              </svg>
+              <h4 className="font-semibold text-lg text-gray-800">
+                Delivery By:
+              </h4>
+       <p className="text-gray-500 text-lg">{new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
             </div>
           </div>
         </div>
-      </main>
+      </div>
+     <MobileProductDetailsSub  productId={productId} />
     </div>
+  
+  </>
   );
-}
+};
 
 export default MobileProductDetails;

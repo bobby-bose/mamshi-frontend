@@ -1,53 +1,32 @@
 import React, { useEffect, useState } from "react";
-import qrcode from "../../assets/qrcode.png";
+// Assuming you have the QR code image locally, otherwise you can use a placeholder
+import qrcode from "../../assets/qrcode.png"; 
 
 export default function PaymentPage() {
-  const [productName, setProductName] = useState("");
-  const [productDescription, setProductDescription] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
+  // Get the total price from session storage and convert it to a number
+  const totalPrice = parseFloat(sessionStorage.getItem("totalPrice"));
 
-  // size → color mapping
-  const sizeColors = {
-    S: "bg-green-500",
-    M: "bg-blue-500",
-    L: "bg-purple-500",
-    XL: "bg-red-500",
-  };
-
+  // This useEffect is currently empty but can be used for future logic
   useEffect(() => {
-    const name = sessionStorage.getItem("productName");
-    const description = sessionStorage.getItem("productDescription");
-    const size = sessionStorage.getItem("selectedSize"); // get size from storage
-
-    if (name) setProductName(name);
-    if (description) setProductDescription(description);
-    if (size) setSelectedSize(size);
+    // You could add logic here to handle payment status updates or timers
   }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 pt-[50px]">
-      {/* Product name */}
-      <h1 className="text-xl sm:text-2xl font-bold mb-2 text-center">
-        {productName}
-      </h1>
-      <h3 className="text-sm sm:text-lg text-darkGray-700 mb-6 text-center">
-        {productDescription}
-      </h3>
-
-      {/* Selected Size Button */}
-      {selectedSize && (
-        <button
-          className={`px-6 py-2 rounded-full text-white font-semibold shadow-md mb-6 ${sizeColors[selectedSize] || "bg-gray-500"}`}
-        >
-          {selectedSize === "S" && "Small (S)"}
-          {selectedSize === "M" && "Medium (M)"}
-          {selectedSize === "L" && "Large (L)"}
-          {selectedSize === "XL" && "Extra Large (XL)"}
-        </button>
-      )}
+      {/* Payment message with the total price */}
+      <div className="text-center mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+          Total Amount: ₹{totalPrice ? totalPrice.toFixed(2) : "0.00"}
+        </h2>
+        <p className="mt-2 text-darkGray-600 text-base sm:text-lg">
+          Please pay the amount to the QR code below to complete your order.
+        </p>
+      </div>
 
       {/* QR code image */}
       <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center">
+        {/* Placeholder for the QR code image if you don't have one */}
+        {/* You should replace this with a proper QR code image URL or base64 data if available */}
         <img
           src={qrcode}
           alt="QR Code"
