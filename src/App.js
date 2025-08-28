@@ -42,6 +42,7 @@ import MobileProductDetails from './components/ProductDetails/MobileProductDetai
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import CounterBanner from './components/Home/Banner/top';
+import AdminStockUpdate from './components/AdminStockUpdate';
 
 
 
@@ -90,6 +91,7 @@ function App() {
         <Route path="/product/:id" element={<MobileProductDetails />} />
         <Route path="/products" element={<MobileProducts />} />
         <Route path="/products/:keyword" element={<Products />} />
+        <Route path="/admin/stock-update" element={<AdminStockUpdate />} />
 
         <Route path="/cart" element={<Cart />} />
 
