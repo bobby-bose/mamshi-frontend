@@ -7,6 +7,25 @@ import CounterBanner from "../Home/Banner/top";
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
+  // Add this colorMap above your component
+const colorMap = {
+  Black: "#000000",
+  White: "#FFFFFF",
+  Blue: "#1E90FF",
+  "Dark Green": "#006400",
+  Cream: "#FFFDD0",
+  Red: "#FF0000",
+  Maroon: "#800000",
+  "Mustard Yellow": "#FFDB58",
+  Beige: "#F5F5DC",
+  SkyBlue: "#87CEEB",
+  Olive: "#808000",
+  "Black & White Stripes": "repeating-linear-gradient(45deg, #000 0 5%, #fff 5% 10%)",
+  "Blue & White Stripes": "repeating-linear-gradient(45deg, #1E90FF 0 5%, #fff 5% 10%)",
+  "Mustard Yellow & White Stripes": "repeating-linear-gradient(45deg, #FFDB58 0 5%, #fff 5% 10%)",
+  "Maroon/Burgundy & White Stripes": "repeating-linear-gradient(45deg, #800000 0 5%, #fff 5% 10%)",
+};
+
 
   const mobileNumber = sessionStorage.getItem("mobileNumber");
   if (!mobileNumber) {
@@ -52,7 +71,7 @@ export default function Wishlist() {
     setWishlist(prevWishlist =>
       prevWishlist.map(item =>
         item._id === itemId
-          ? { ...item, quantity: Math.max(1, item.quantity + change) } // Ensure quantity is at least 1
+          ? { ...item, count: Math.max(1, item.count + change) } // Ensure count is at least 1
           : item
       )
     );
@@ -61,7 +80,7 @@ export default function Wishlist() {
   // Calculate the total price of all items in the wishlist
   const totalPrice = wishlist.reduce((total, item) => {
     const price = item.product?.productDetails?.Price || 0;
-    const quantity = item.quantity || 1; 
+    const quantity = item.count || 1; 
     return total + price * quantity;
   }, 0);
 
@@ -110,18 +129,38 @@ export default function Wishlist() {
                   ₹{item.product?.productDetails?.Price}
                 </p>
 
-                {/* Sizes */}
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <span className="text-lg font-semibold">
-                    {item.size}
-                  </span>
-                </div>
+               {/* Ordered Size and Color */}
+{/* Ordered Size and Color */}
+<div className="mt-2">
+  {/* Size */}
+  <div className="flex items-center gap-2 mb-1">
+    <span className="font-semibold text-gray-700">Ordered Size:</span>
+    <span className="text-lg font-semibold">{item.size}</span>
+  </div>
+
+  {/* Color */}
+  {item.color && (
+    <div className="flex items-center gap-2">
+      <span className="font-semibold text-gray-700">Ordered Color:</span>
+      <span
+        className="w-6 h-6 rounded-full border border-gray-300"
+        style={{
+          background: colorMap[item.color] || "#000",
+        }}
+        title={item.color}
+      ></span>
+      <span className="text-sm">{item.color}</span>
+    </div>
+  )}
+</div>
+
+
 
                 {/* Quantity Counter */}
                 <div className="flex items-center mt-3">
                   <div className="flex items-center border border-gray-300 rounded-lg px-2 py-1">
                     <button onClick={() => handleQuantityChange(item._id, -1)} className="text-gray-500 hover:text-gray-800 text-lg font-bold">-</button>
-                    <span className="mx-3 text-sm font-semibold">{item.quantity}</span>
+                    <span className="mx-3 text-sm font-semibold">{item.count}</span>
                     <button onClick={() => handleQuantityChange(item._id, 1)} className="text-gray-500 hover:text-gray-800 text-lg font-bold">+</button>
                   </div>
                 </div>
