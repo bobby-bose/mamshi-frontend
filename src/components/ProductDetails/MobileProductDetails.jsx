@@ -133,6 +133,14 @@ const buyNow = async () => {
   }
 
   const totalPrice = data.Price * quantity;
+  console.log("🔹 Sending addOrders request with:", {
+  productId: id,
+  mobileNumber,
+  size,
+  color: color || null,
+  count: quantity,
+});
+
   try {
     await client.post("/orders/productId/mobilenumber", {
       productId: id,

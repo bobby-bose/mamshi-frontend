@@ -43,6 +43,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import CounterBanner from './components/Home/Banner/top';
 import AdminStockUpdate from './components/AdminStockUpdate';
+import PaymentSuccess from './components/Cart/PaymentSuccess';
 
 
 
@@ -88,6 +89,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/checkout" element={<PaymentPage />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/product/:id" element={<MobileProductDetails />} />
         <Route path="/products" element={<MobileProducts />} />
         <Route path="/products/:keyword" element={<Products />} />

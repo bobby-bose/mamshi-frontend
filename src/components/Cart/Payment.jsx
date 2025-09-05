@@ -2,13 +2,23 @@
 import { useEffect } from "react";
 import axios from "axios";
 
-const PaymentPage = ({ userId, amount }) => {
+const PaymentPage = () => {
   useEffect(() => {
     const startPayment = async () => {
+      // Generate a random userId
+      const userId = "user_" + Math.floor(Math.random() * 1000000);
+      // Get amount from session storage
+      const amount = 100;
+
       console.log("🔹 Initiating payment for user:", userId, "amount:", amount);
 
+      if (!amount) {
+        console.error("❌ Amount not found in session storage");
+        return;
+      }
+
       try {
-        const response = await axios.post("http://localhost:5000/payments/start", { userId, amount });
+        const response = await axios.post("https://mamshi-backend.onrender.com/api/v1/payments/start", { userId, amount });
         console.log("✅ Payment start response:", response.data);
 
         const paymentUrl = response.data.paymentUrl;
@@ -24,7 +34,7 @@ const PaymentPage = ({ userId, amount }) => {
     };
 
     startPayment();
-  }, [userId, amount]);
+  }, []);
 
   return <h2>Redirecting to payment...</h2>;
 };

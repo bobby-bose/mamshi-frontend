@@ -3,43 +3,59 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
-const PaymentSuccess = ({ userId }) => {
+const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [statusMessage, setStatusMessage] = useState("Verifying your payment...");
 
   useEffect(() => {
+    console.log("🔹 Full URL:", window.location.href); // Log the entire URL
+
     const verifyPayment = async () => {
+      // Extract query params from URL
+      const status = searchParams.get("status"); // SUCCESS or FAILED
       const merchantOrderId = searchParams.get("merchantOrderId");
-      const txnId = searchParams.get("txnId");
-      const amount = searchParams.get("amount");
+      const phonePeTxnId = searchParams.get("phonePeTxnId");
+      const amount = sessionStorage.getItem("amount"); // still get amount from sessionStorage or backend
+      const userId = sessionStorage.getItem("userId"); // userId stored before payment
 
-      console.log("🔹 Payment success page loaded with query params:", { merchantOrderId, txnId, amount });
+      console.log("Payment success page loaded with params:", {
+        status,
+        merchantOrderId,
+        phonePeTxnId,
+        amount,
+        userId,
+      });
 
-      if (!merchantOrderId || !txnId || !amount) {
+      if (!merchantOrderId || !phonePeTxnId || !amount || !userId) {
         setStatusMessage("Invalid payment data received.");
-        console.error("❌ Missing query parameters");
+        console.error("❌ Missing required payment parameters");
+        return;
+      }
+
+      if (status !== "SUCCESS") {
+        setStatusMessage("❌ Payment failed or cancelled.");
         return;
       }
 
       try {
-        console.log("🔹 Calling backend /payments/complete API");
-        const response = await axios.post("http://localhost:5000/payments/complete", {
+        // Call backend to verify & complete payment
+        const response = await axios.post("https://mamshi-backend.onrender.com/api/v1/payments/complete", {
           userId,
           amount,
           merchantOrderId,
-          phonePeTxnId: txnId,
+          phonePeTxnId,
         });
 
-        console.log("✅ /payments/complete response:", response.data);
+        console.log("/payments/complete response:", response.data);
         setStatusMessage("✅ Payment successful!");
       } catch (error) {
         setStatusMessage("❌ Payment verification failed.");
-        console.error("❌ /payments/complete failed:", error.response?.data || error.message);
+        console.error("/payments/complete failed:", error.response?.data || error.message);
       }
     };
 
     verifyPayment();
-  }, [searchParams, userId]);
+  }, [searchParams]);
 
   return <h2>{statusMessage}</h2>;
 };

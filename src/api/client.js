@@ -1,9 +1,11 @@
 import axios from "axios";
 
 // Use the Render backend in production
-const baseURL = window.location.hostname.includes("netlify.app")
-  ? "https://mamshi-backend.onrender.com/api/v1"
-  : "http://54.234.210.63:4000/api/v1"; // optional: local EC2 for development
+const baseURL = "https://mamshi-backend.onrender.com/api/v1";
+
+// window.location.hostname.includes("netlify.app")
+//   ? "https://mamshi-backend.onrender.com/api/v1"
+//   : ""; // optional: local EC2 for development
 
 const client = axios.create({
   baseURL,
