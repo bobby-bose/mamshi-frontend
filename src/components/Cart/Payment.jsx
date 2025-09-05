@@ -1,62 +1,32 @@
-import React, { useEffect } from "react";
+// PaymentPage.js
+import { useEffect } from "react";
+import axios from "axios";
 
-export default function PaymentPage() {
-  const totalPrice = parseFloat(sessionStorage.getItem("totalPrice"));
-
+const PaymentPage = ({ userId, amount }) => {
   useEffect(() => {
-    // Could be used for tracking payment status later
-  }, []);
+    const startPayment = async () => {
+      console.log("🔹 Initiating payment for user:", userId, "amount:", amount);
 
-  // UPI details
-  const upiId = "bobbykboseoffice@okaxis.com";
-  const name = "BOBBY K BOSE";
-  const amount = totalPrice ? totalPrice.toFixed(2) : "0.00";
-  const note = "Order Payment";
+      try {
+        const response = await axios.post("http://localhost:5000/payments/start", { userId, amount });
+        console.log("✅ Payment start response:", response.data);
 
-  // Google Pay Intent link
-  const gpayLink = `intent://pay?pa=${encodeURIComponent(
-    upiId
-  )}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(
-    note
-  )}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end;`;
+        const paymentUrl = response.data.paymentUrl;
+        if (paymentUrl) {
+          console.log("🔹 Redirecting to PhonePe payment page:", paymentUrl);
+          window.location.href = paymentUrl;
+        } else {
+          console.error("❌ Payment URL not found in response");
+        }
+      } catch (error) {
+        console.error("❌ Payment initiation failed:", error.response?.data || error.message);
+      }
+    };
 
-  // PhonePe Intent link
-  const phonepeLink = `intent://pay?pa=${encodeURIComponent(
-    upiId
-  )}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR&tn=${encodeURIComponent(
-    note
-  )}#Intent;scheme=upi;package=com.phonepe.app;end;`;
+    startPayment();
+  }, [userId, amount]);
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-6 text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
-          Total Amount: ₹{amount}
-        </h2>
-        <p className="text-gray-600 mb-8">
-          Press a button below to complete your payment securely:
-        </p>
+  return <h2>Redirecting to payment...</h2>;
+};
 
-        <div className="space-y-4">
-          {/* Google Pay Button */}
-          <a
-            href={gpayLink}
-            className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-md transition"
-          >
-           
-            Pay with Google Pay
-          </a>
-
-          {/* PhonePe Button */}
-          <a
-            href={phonepeLink}
-            className="w-full flex items-center justify-center px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl shadow-md transition"
-          >
-           
-            Pay with PhonePe
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
+export default PaymentPage;

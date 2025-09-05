@@ -1,11 +1,10 @@
 import axios from "axios";
 
-const REACT_API="http://localhost:4000"
+// Use the Render backend in production
+const baseURL = window.location.hostname.includes("netlify.app")
+  ? "https://mamshi-backend.onrender.com/api/v1"
+  : "http://54.234.210.63:4000/api/v1"; // optional: local EC2 for development
 
-const baseURL =
- REACT_API +
-  "/api/v1"; // fallback if using Netlify proxy
-console.log("The frontend URL is",baseURL);
 const client = axios.create({
   baseURL,
   withCredentials: true, // needed if backend uses cookies

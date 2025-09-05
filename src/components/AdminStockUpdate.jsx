@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import client from "../api/client";
 
 export default function AdminStockUpdate() {
   const [products, setProducts] = useState([]);
@@ -11,7 +12,7 @@ export default function AdminStockUpdate() {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/v1/products/all");
+      const res = await client.get("/products/all");
       setProducts(res.data.products);
       console.log(res.data.products);
       setLoading(false);
@@ -23,7 +24,7 @@ export default function AdminStockUpdate() {
 
   const updateStock = async (productId, stock) => {
     try {
-      await axios.put(`http://localhost:4000/api/v1/products/${productId}/stock`, { stock });
+      await client.put(`/products/${productId}/stock`, { stock });
       alert("Stock updated successfully!");
       fetchProducts(); // refresh after update
     } catch (error) {

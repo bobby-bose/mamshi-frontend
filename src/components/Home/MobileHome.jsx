@@ -29,7 +29,7 @@ const MobileHome = () => {
       <main className="flex flex-col gap-2 px-3 mt-14 sm:mt-4">
         {/* Banner Section */}
         <div className="w-full h-70 sm:h-50">
-               {/* <CounterBanner /> */}
+               <CounterBanner />
           <MobilePromoBanner  />
         </div>
 
