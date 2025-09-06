@@ -6,23 +6,22 @@ const CounterBanner = () => {
   const initialVouchers = 50000;
   const [vouchersLeft, setVouchersLeft] = useState(initialVouchers);
 
-  useEffect(() => {
-    const fetchOrdersAndSetVouchers = async () => {
-      try {
-        const response = await client.get('/orders');
-        console.log("Fetched orders:", response.data);
-    
-        const uniqueCustomers = response.data.numberOfCustomers;
-        const remaining = initialVouchers - uniqueCustomers;
-        setVouchersLeft(Math.max(0, remaining));
-      } catch (error) {
-        console.error("Failed to fetch orders:", error);
-        setVouchersLeft(initialVouchers);
-      }
-    };
-  const intervalId = setInterval(fetchOrdersAndSetVouchers, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+useEffect(() => {
+  const fetchVouchers = async () => {
+    try {
+      const response = await client.get('/orders'); // new backend route
+      console.log("Vouchers data:", response.data);
+      setVouchersLeft(response.data.vouchersLeft);
+    } catch (error) {
+      console.error("Failed to fetch vouchers:", error);
+      setVouchersLeft(50000);
+    }
+  };
+
+  const intervalId = setInterval(fetchVouchers, 1000);
+  return () => clearInterval(intervalId);
+}, []);
+
 
   const formatNumber = (num) => {
     return String(Math.max(0, num)).padStart(5, '0');

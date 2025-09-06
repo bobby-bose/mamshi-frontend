@@ -1,26 +1,36 @@
-// PaymentPage.js
 import { useEffect } from "react";
-import axios from "axios";
+import client from "../../api/client";
 
 const PaymentPage = () => {
   useEffect(() => {
     const startPayment = async () => {
       // Generate a random userId
       const userId = "user_" + Math.floor(Math.random() * 1000000);
-      // Get amount from session storage
       const amount = 100;
+      const useremail = sessionStorage.getItem("mobileNumber");
 
       console.log("🔹 Initiating payment for user:", userId, "amount:", amount);
 
-      if (!amount) {
-        console.error("❌ Amount not found in session storage");
-        return;
-      }
+      // Save to sessionStorage so success page can read it
+      sessionStorage.setItem("userId", userId);
+      sessionStorage.setItem("amount", amount);
 
       try {
-        const response = await axios.post("https://mamshi-backend.onrender.com/api/v1/payments/start", { userId, amount });
+        const response = await client.post("/payments/start", { userId, amount , useremail });
+
         console.log("✅ Payment start response:", response.data);
 
+        // Save merchantOrderId (required later)
+        if (response.data.merchantOrderId) {
+          sessionStorage.setItem("merchantOrderId", response.data.merchantOrderId);
+        }
+
+        // Optionally, if backend already returns phonePeTxnId (rare at this stage), save it
+        if (response.data.phonePeTxnId) {
+          sessionStorage.setItem("phonePeTxnId", response.data.phonePeTxnId);
+        }
+
+        // Redirect user to PhonePe page
         const paymentUrl = response.data.paymentUrl;
         if (paymentUrl) {
           console.log("🔹 Redirecting to PhonePe payment page:", paymentUrl);
