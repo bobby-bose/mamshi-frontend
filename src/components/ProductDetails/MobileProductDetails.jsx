@@ -62,7 +62,15 @@ const MobileProductDetails = () => {
   const itemInWishlist = wishlistItems.some((i) => i.product === id);
   const itemInCart = cartItems.some((i) => i.product === id);
 
-  const allImages = data ? [data.main, data.sub].filter(Boolean) : [];
+  console.log("Main image:", data.main);
+console.log("Sub image:", data.sub);
+
+
+const allImages = data
+  ? [data.main, data.sub].filter(Boolean).map((p) => `http://localhost:4000${p}`) // remove extra /uploads/
+  : [];
+
+
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -113,7 +121,7 @@ const addToCartHandler = async () => {
   try {
     await client.post(`/wishlist/${id}/${mobileNumber}`, {
       size,
-      color: color || null, // pass null if no color
+      color: color || null,
       count: quantity,
     });
     enqueueSnackbar("✅ Product Added To Cart", { variant: "success" });
@@ -133,28 +141,23 @@ const buyNow = async () => {
   }
 
   const totalPrice = data.Price * quantity;
-  console.log("🔹 Sending addOrders request with:", {
-  productId: id,
-  mobileNumber,
-  size,
-  color: color || null,
-  count: quantity,
-});
 
   try {
     await client.post("/orders/productId/mobilenumber", {
       productId: id,
       mobileNumber,
       size,
-      color: color || null, // pass null if no color
+      color: color || null,
       count: quantity,
     });
     sessionStorage.setItem("totalPrice", totalPrice);
     navigate("/checkout");
   } catch (error) {
-    enqueueSnackbar("❌ Failed to place order", { variant: "error" });
+    enqueueSnackbar("🔒 Please log in to continue", { variant: "error" });
+    navigate("/login");
   }
 };
+
 
 
   const toggleWishlist = () => {
@@ -258,28 +261,28 @@ const buyNow = async () => {
               <span className="text-2xl font-bold text-gray-900">₹{data.Price?.toLocaleString()}</span>
             </div>
 
-            {/* Color Selection */}
-            {data.colors && data.colors.length > 0 && (
-              <div className="mb-6">
-                <h4 className="text-md font-semibold text-gray-800 mb-2">
-                  Color: {color || "Choose a color"}
-                </h4>
-                <div className="flex gap-3 flex-wrap">
-                  {data.colors.map((c) => (
-                    <div
-                      key={c}
-                      className={`w-10 h-10 rounded-full border-2 cursor-pointer ${
-                        color === c ? "border-black" : "border-gray-300"
-                      }`}
-                      style={{
-                        background: colorMap[c] || "#ccc",
-                      }}
-                      onClick={() => setColor(c)}
-                    ></div>
-                  ))}
-                </div>
-              </div>
-            )}
+{data.colors && data.colors.length > 0 && (
+  <div className="mb-6">
+    <h4 className="text-md font-semibold text-gray-800 mb-2">
+      Color: {color || "Choose a color"}
+    </h4>
+    <div className="flex gap-3 flex-wrap">
+      {data.colors.map((c) => (
+        <div
+          key={c}
+          className={`w-10 h-10 rounded-full border-2 cursor-pointer ${
+            color === c ? "border-black" : "border-gray-300"
+          }`}
+          style={{
+            background: colorMap[c] || "#ccc",
+          }}
+          onClick={() => setColor(c)}
+        ></div>
+      ))}
+    </div>
+  </div>
+)}
+
 
             {/* Size Selection */}
             {availableSizes.length > 0 && (
@@ -314,23 +317,20 @@ const buyNow = async () => {
            {/* Quantity & Actions */}
 <div className="flex flex-col gap-4">
   {/* Stock Status */}
-  <div>
-    {data.stock > 0 ? (
-      <button
-        disabled
-        className="w-full bg-green-600 text-white font-semibold py-3 rounded-xl cursor-not-allowed"
-      >
-        STOCK AVAILABLE
-      </button>
-    ) : (
-      <button
-        disabled
-        className="w-full bg-red-600 text-white font-semibold py-3 rounded-xl cursor-not-allowed"
-      >
-        OUT OF STOCK
-      </button>
-    )}
-  </div>
+{/* Stock Status */}
+<div
+  className={`w-full px-4 py-2 rounded-full text-white font-semibold mb-2 
+    flex justify-center items-center
+
+    text-lg
+    ${
+    data.stock > 0 ? "bg-green-600" : "bg-red-600"
+  }`}
+>
+  {data.stock > 0 ? "STOCK AVAILABLE" : "OUT OF STOCK"}
+</div>
+
+
 
   {/* Quantity and Buttons */}
   <div className="flex items-center gap-4">

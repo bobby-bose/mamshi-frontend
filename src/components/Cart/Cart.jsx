@@ -109,13 +109,25 @@ const colorMap = {
               className="bg-white rounded-2xl shadow p-4 flex flex-col sm:flex-row sm:items-start"
             >
               {/* Product Image */}
-              <div className="w-full sm:w-40 flex justify-center">
-                <img
-                  src={item.product?.productDetails?.main}
-                  alt={item.product?.productDetails?.Name}
-                  className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-xl"
-                />
-              </div>
+            <div className="w-full sm:w-40 flex justify-center">
+  {item.product?.productDetails ? (
+    <img
+      src={
+        item.product.productDetails.main
+          ? `http://localhost:4000${item.product.productDetails.main}`
+          : "/placeholder.png"
+      }
+      alt={item.product.productDetails.Name}
+      className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-xl"
+    />
+  ) : (
+    <img
+      src="/placeholder.png"
+      alt="Product not available"
+      className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-xl"
+    />
+  )}
+</div>
 
               {/* Product Details */}
               <div className="mt-4 sm:mt-0 sm:ml-4 flex-1">
@@ -126,7 +138,7 @@ const colorMap = {
                   {item.product?.productDetails?.Description}
                 </p>
                 <p className="text-lg font-bold mt-2">
-                  ₹{item.product?.productDetails?.Price}
+                  ₹{item.product?.productDetails?.Price ?? "-"}
                 </p>
 
                {/* Ordered Size and Color */}

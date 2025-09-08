@@ -176,17 +176,18 @@ const MobileProducts = () => {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4 justify-center items-start w-full bg-white p-2 sm:p-4">
                                         {initialProducts?.map((product) => (
                                             <div key={product._id} className="flex flex-col gap-2 p-2 border rounded-md">
-                                                <ProductImageSlider images={[product.main, product.sub]} />
+                                              <ProductImageSlider 
+  images={[
+    product.main ? `http://localhost:4000${product.main}` : '/placeholder.png',
+    product.sub ? `http://localhost:4000${product.sub}` : '/placeholder.png',
+  ]} 
+/>
+
                                                 <div>
                                                     <h2 className="text-large font-large text-darkGray-700">{product.Name}</h2>
                                                     <p className="text-stone text-medium">₹{product.Price}</p>
                                                     <p className="text-medium text-stone ">{product.Description}</p>
-                                                     <div className="flex gap-2 mt-2">
-                    {product.S && <SizeButton size='S' isAvailable={product.S} color='white' bgColor='rgba(255, 5, 5, 1)' />}
-                    {product.M && <SizeButton size='M' isAvailable={product.M} color='white' bgColor='rgba(19, 88, 50, 1)' />}
-                    {product.L && <SizeButton size='L' isAvailable={product.L} color='white' bgColor='rgba(0, 0, 0, 1)' />}
-                    {product.XL && <SizeButton size='XL' isAvailable={product.XL} color='white' bgColor='rgba(50, 13, 197, 1)' />}
-                </div>
+                                                     
                  {/* Product details button with a nice hover eefect and light greyish transiitona nd slow animation woth grey , blur and slight dark red color */}
 
  <Link to={`/product/${product._id}`}>

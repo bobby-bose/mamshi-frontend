@@ -9,18 +9,20 @@ const CounterBanner = () => {
 useEffect(() => {
   const fetchVouchers = async () => {
     try {
-      const response = await client.get('/orders'); // new backend route
+      const response = await client.get('/orders');
       console.log("Vouchers data:", response.data);
-      setVouchersLeft(response.data.vouchersLeft);
+      const sold = response.data.numberOfCustomers || 0;
+      setVouchersLeft(initialVouchers - sold);
     } catch (error) {
       console.error("Failed to fetch vouchers:", error);
-      setVouchersLeft(50000);
+      setVouchersLeft(initialVouchers);
     }
   };
 
   const intervalId = setInterval(fetchVouchers, 1000);
   return () => clearInterval(intervalId);
 }, []);
+
 
 
   const formatNumber = (num) => {
