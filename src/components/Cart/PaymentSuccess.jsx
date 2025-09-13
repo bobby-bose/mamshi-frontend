@@ -5,7 +5,7 @@ import Confetti from "react-confetti";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const PaymentSuccess = () => {
-  const { orderId } = useParams(); // ✅ get parameter from URL
+  const { orderId } = useParams();
   const [statusMessage, setStatusMessage] = useState("Verifying your payment...");
   const [success, setSuccess] = useState(null);
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
@@ -18,28 +18,49 @@ const PaymentSuccess = () => {
       const amount = sessionStorage.getItem("amount");
       let merchantOrderId = sessionStorage.getItem("merchantOrderId");
       let phonePeTxnId = sessionStorage.getItem("phonePeTxnId");
+      let email=sessionStorage.getItem("mobileNumber");
+      let products = sessionStorage.getItem("products");
+      let deliveryDetails = sessionStorage.getItem("deliveryDetails");
+
+
+
 
       // ✅ If URL has an orderId, override session one
       if (orderId) {
         merchantOrderId = orderId;
       }
 
-      if (!userId || !amount || !merchantOrderId) {
+      console.log("💡 Session data before verification:", {
+        userId,
+        amount,
+        merchantOrderId,
+        phonePeTxnId,
+      });
+
+      if (!userId || !amount || !merchantOrderId || !phonePeTxnId) {
+        console.error("❌ Missing critical session data for payment verification!");
         setStatusMessage("❌ Missing payment session data.");
         setSuccess(false);
         return;
       }
 
       try {
+        console.log("🔄 Sending payment verification request to backend...");
         const response = await client.post("/payments/complete", {
           userId,
           amount,
           merchantOrderId,
           phonePeTxnId,
+          email,
+          products,
+          deliveryDetails
         });
+
+        console.log("📩 Backend response received:", response.data);
 
         if (response.data.phonePeTxnId) {
           sessionStorage.setItem("phonePeTxnId", response.data.phonePeTxnId);
+          console.log("✅ Stored phonePeTxnId in sessionStorage:", response.data.phonePeTxnId);
         }
 
         if (response.data.success) {
@@ -47,14 +68,16 @@ const PaymentSuccess = () => {
           setStatusMessage(
             "Thank you for shopping at Sloutch DRESS! 🎉 Your order is confirmed."
           );
+          console.log("🎉 Payment verified successfully!");
         } else {
           setSuccess(false);
           setStatusMessage("❌ Payment failed or not confirmed. Please try again.");
+          console.warn("⚠️ Payment verification failed. Backend returned success=false");
         }
       } catch (error) {
         setSuccess(false);
         setStatusMessage("❌ Payment verification failed. Please contact support.");
-        console.error("/payments/complete failed:", error.response?.data || error.message);
+        console.error("🚨 /payments/complete API call failed:", error.response?.data || error.message);
       }
     };
 

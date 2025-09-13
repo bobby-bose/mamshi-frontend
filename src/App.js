@@ -88,7 +88,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/otp" element={<Otp />} />
-        <Route path="/checkout" element={<PaymentPage />} />
+        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
         <Route path="/product/:id" element={<MobileProductDetails />} />
         <Route path="/products" element={<MobileProducts />} />
