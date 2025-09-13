@@ -52,6 +52,12 @@ const MobileProductDetails = () => {
 
   const mobileNumber = sessionStorage.getItem("mobileNumber");
 
+if (!mobileNumber) {
+  // mobileNumber is null, undefined, or empty
+  window.location.href = "/LoginRedirectPage"; // or your login page route
+}
+
+
   const { cartItems } = useSelector((state) => state.cart);
   const { wishlistItems } = useSelector((state) => state.wishlist);
 

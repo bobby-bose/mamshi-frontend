@@ -18,7 +18,7 @@ const PaymentSuccess = () => {
       const amount = sessionStorage.getItem("amount");
       let merchantOrderId = sessionStorage.getItem("merchantOrderId");
  
-      let email=sessionStorage.getItem("mobileNumber");
+      let email = sessionStorage.getItem("mobileNumber");
       let products = sessionStorage.getItem("products");
       let deliveryDetails = sessionStorage.getItem("deliveryDetails");
 

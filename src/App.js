@@ -44,6 +44,8 @@ import "slick-carousel/slick/slick-theme.css";
 import CounterBanner from './components/Home/Banner/top';
 import AdminStockUpdate from './components/AdminStockUpdate';
 import PaymentSuccess from './components/Cart/PaymentSuccess';
+import LoginRedirectPage from './components/ProductDetails/redirect';
+
 
 
 
@@ -94,6 +96,7 @@ function App() {
         <Route path="/products" element={<MobileProducts />} />
         <Route path="/products/:keyword" element={<Products />} />
         <Route path="/admin/stock-update" element={<AdminStockUpdate />} />
+        <Route path="/LoginRedirectPage" element={<LoginRedirectPage />} />
 
         <Route path="/cart" element={<Cart />} />
 
