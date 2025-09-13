@@ -18,6 +18,7 @@ import { Carousel } from "react-responsive-carousel";
 import client from "../../api/client";
 import MobileProductDetailsSub from "./MobileProductDetailsSub";
 import {BACKEND_URL} from "../../constant.js";
+import DeliveryDetailsModal from "./DeliveryDetails";
 
 
 const colorMap = {
@@ -55,6 +56,9 @@ const MobileProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+const [deliveryInfo, setDeliveryInfo] = useState({});
+const [pendingAction, setPendingAction] = useState(null); // "cart" or "buy"
 
   const mobileNumber = sessionStorage.getItem("mobileNumber");
 
@@ -181,6 +185,38 @@ const buyNow = async () => {
     setSize("");
     setColor("");
   };
+
+  const handleAddToCartClick = () => {
+  setPendingAction("cart");
+  setIsModalOpen(true);
+};
+
+const handleBuyNowClick = () => {
+  setPendingAction("buy");
+  setIsModalOpen(true);
+};
+
+// Inside handleModalSubmit
+const handleModalSubmit = (deliveryDetails) => {
+  setDeliveryInfo(deliveryDetails);
+  setIsModalOpen(false);
+
+  // Save order info in sessionStorage to pass to PaymentPage
+  const orderData = {
+    productId: id,
+    size,
+    color: color || null,
+    count: quantity,
+    deliveryDetails,
+    mobileNumber
+  };
+  sessionStorage.setItem("pendingOrder", JSON.stringify(orderData));
+
+  // Redirect to payment page
+  navigate("/payment");
+};
+
+
 
   if (!data.Name) return <Loader />;
 
@@ -370,21 +406,30 @@ const buyNow = async () => {
       </button>
     </div>
     <button
-      className="flex-1 bg-white border border-gray-300 text-gray-900 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors"
-      onClick={addToCartHandler}
-      disabled={data.stock === 0}
-    >
-      Add to cart
-    </button>
+  className="flex-1 bg-white border border-gray-300 text-gray-900 font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors"
+  onClick={handleAddToCartClick}
+  disabled={data.stock === 0}
+>
+  Add to cart
+</button>
+
+<DeliveryDetailsModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  onSubmit={handleModalSubmit}
+  initialData={deliveryInfo}
+/>
+
+
   </div>
 
   <button
-    className="w-full bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors"
-    onClick={buyNow}
-    disabled={data.stock === 0}
-  >
-    Buy Now
-  </button>
+  className="w-full bg-gray-900 text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors"
+  onClick={handleBuyNowClick}
+  disabled={data.stock === 0}
+>
+  Buy Now
+</button>
 </div>
 
 

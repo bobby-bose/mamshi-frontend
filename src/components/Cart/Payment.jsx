@@ -1,50 +1,55 @@
 import { useEffect } from "react";
 import client from "../../api/client";
+import { useNavigate } from "react-router-dom";
 
 const PaymentPage = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     const startPayment = async () => {
-      // Generate a random userId
+      const pendingOrder = JSON.parse(sessionStorage.getItem("pendingOrder"));
+      if (!pendingOrder) {
+        alert("No order info found");
+        navigate("/");
+        return;
+      }
+
+      const { productId, size, color, count, deliveryDetails, mobileNumber } = pendingOrder;
       const userId = "user_" + Math.floor(Math.random() * 1000000);
-      const amount = 100;
-      const useremail = sessionStorage.getItem("mobileNumber");
+      const amount = pendingOrder.count * pendingOrder.Price || 100; // fallback
+      const useremail = mobileNumber;
 
-      console.log("🔹 Initiating payment for user:", userId, "amount:", amount);
-
-      // Save to sessionStorage so success page can read it
       sessionStorage.setItem("userId", userId);
       sessionStorage.setItem("amount", amount);
 
       try {
-        const response = await client.post("/payments/start", { userId, amount , useremail });
+        const response = await client.post("/payments/start", {
+          userId,
+          amount,
+          useremail,
+          deliveryDetails,
+          products: [{ productId, size, color, count }]
+        });
 
-        console.log("✅ Payment start response:", response.data);
-
-        // Save merchantOrderId (required later)
         if (response.data.merchantOrderId) {
           sessionStorage.setItem("merchantOrderId", response.data.merchantOrderId);
+          sessionStorage.setItem("pendingOrder", JSON.stringify({
+            ...pendingOrder,
+            merchantOrderId: response.data.merchantOrderId
+          }));
         }
 
-        // Optionally, if backend already returns phonePeTxnId (rare at this stage), save it
-        if (response.data.phonePeTxnId) {
-          sessionStorage.setItem("phonePeTxnId", response.data.phonePeTxnId);
-        }
-
-        // Redirect user to PhonePe page
         const paymentUrl = response.data.paymentUrl;
-        if (paymentUrl) {
-          console.log("🔹 Redirecting to PhonePe payment page:", paymentUrl);
-          window.location.href = paymentUrl;
-        } else {
-          console.error("❌ Payment URL not found in response");
-        }
-      } catch (error) {
-        console.error("❌ Payment initiation failed:", error.response?.data || error.message);
+        if (paymentUrl) window.location.href = paymentUrl;
+        else console.error("Payment URL missing");
+
+      } catch (err) {
+        console.error("Payment start failed:", err.response?.data || err.message);
       }
     };
 
     startPayment();
-  }, []);
+  }, [navigate]);
 
   return <h2>Redirecting to payment...</h2>;
 };
