@@ -15,6 +15,9 @@ import client from '../../api/client';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import CounterBanner from '../Home/Banner/top';
+import {BACKEND_URL} from "../../constant.js";
+
+
 
 const SizeButton = ({ size, isAvailable, color, bgColor }) => {
     // Determine the class names based on availability
@@ -178,8 +181,8 @@ const MobileProducts = () => {
                                             <div key={product._id} className="flex flex-col gap-2 p-2 border rounded-md">
                                               <ProductImageSlider 
   images={[
-    product.main ? `http://localhost:4000${product.main}` : '/placeholder.png',
-    product.sub ? `http://localhost:4000${product.sub}` : '/placeholder.png',
+    product.main ? `${BACKEND_URL}${product.main}` : '/placeholder.png',
+    product.sub ? `${BACKEND_URL}${product.sub}` : '/placeholder.png',
   ]} 
 />
 

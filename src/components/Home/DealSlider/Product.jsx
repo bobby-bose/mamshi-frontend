@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import {BACKEND_URL} from "../../../constant.js";
 /**
  * Product component to display a single product card with main & sub images.
  *
@@ -17,7 +17,7 @@ const Product = ({ _id, Name, Price, Description, main, sub, stock }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Prepare images array
-  const images = [main, sub].filter(Boolean).map((img) => `http://localhost:4000${img}`);
+  const images = [main, sub].filter(Boolean).map((img) => `${BACKEND_URL}${img}`);
 
   // Handle left/right navigation
   const prevImage = (e) => {

@@ -17,6 +17,8 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 import client from "../../api/client";
 import MobileProductDetailsSub from "./MobileProductDetailsSub";
+import {BACKEND_URL} from "../../constant.js";
+
 
 const colorMap = {
   Black: "#000000",
@@ -67,7 +69,7 @@ console.log("Sub image:", data.sub);
 
 
 const allImages = data
-  ? [data.main, data.sub].filter(Boolean).map((p) => `http://localhost:4000${p}`) // remove extra /uploads/
+  ? [data.main, data.sub].filter(Boolean).map((p) => `${BACKEND_URL}${p}`) // remove extra /uploads/
   : [];
 
 
@@ -255,7 +257,17 @@ const buyNow = async () => {
               </svg>
             </button>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">{data.Name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+  {data.Name.length > 15 ? (
+    <>
+      {data.Name.slice(0, Math.ceil(data.Name.length / 2))}-<br />
+      {data.Name.slice(Math.ceil(data.Name.length / 2))}
+    </>
+  ) : (
+    data.Name
+  )}
+</h1>
+
             <div className="flex items-center gap-2 mb-4">
               <span className="text-gray-500 line-through text-lg">₹{data.Price?.toLocaleString()}</span>
               <span className="text-2xl font-bold text-gray-900">₹{data.Price?.toLocaleString()}</span>

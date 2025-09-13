@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import client from "../../api/client";
 import CounterBanner from "../Home/Banner/top";
+import {BACKEND_URL} from "../../constant.js";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
@@ -114,7 +115,7 @@ const colorMap = {
     <img
       src={
         item.product.productDetails.main
-          ? `http://localhost:4000${item.product.productDetails.main}`
+          ? `${BACKEND_URL}${item.product.productDetails.main}`
           : "/placeholder.png"
       }
       alt={item.product.productDetails.Name}

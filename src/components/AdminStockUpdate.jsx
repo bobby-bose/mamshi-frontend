@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import client from "../api/client";
 import colors from "../colors";
+import {BACKEND_URL} from "../constant.js";
 
 export default function AdminStockUpdate() {
   const [products, setProducts] = useState([]);
@@ -28,6 +29,7 @@ export default function AdminStockUpdate() {
   const fetchProducts = async () => {
     try {
       const res = await client.get("/products/all");
+      console.log("Fetched products:", res.data.products);
       setProducts(res.data.products);
       setLoading(false);
     } catch (error) {
@@ -283,11 +285,12 @@ if (newProduct.colors.length > 0) {
             {products.map((product) => (
               <tr key={product._id} className="border-b">
                 <td className="p-3">
-                  <img
-                    src={product.main}
-                    alt={product.Name}
-                    className="w-20 h-20 object-cover rounded-md"
-                  />
+                 <img
+  src={`${BACKEND_URL}${product.main}`}
+  alt={product.Name}
+  className="w-20 h-20 object-cover rounded-md"
+/>
+
                 </td>
                 <td className="p-3 font-semibold">{product.Name}</td>
                 <td className="p-3">{product.Description}</td>

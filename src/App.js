@@ -89,7 +89,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/otp" element={<Otp />} />
         <Route path="/checkout" element={<PaymentPage />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-success/:orderId" element={<PaymentSuccess />} />
         <Route path="/product/:id" element={<MobileProductDetails />} />
         <Route path="/products" element={<MobileProducts />} />
         <Route path="/products/:keyword" element={<Products />} />
