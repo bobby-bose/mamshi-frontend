@@ -7,21 +7,32 @@ const PaymentPage = () => {
 
   useEffect(() => {
     const startPayment = async () => {
-      const pendingOrder = JSON.parse(sessionStorage.getItem("pendingOrder"));
-      if (!pendingOrder) {
-        alert("No order info found");
-        navigate("/");
-        return;
-      }
+      const products = JSON.parse(sessionStorage.getItem("products"));
+      const deliveryDetails = JSON.parse(sessionStorage.getItem("deliveryDetails"));
+      const totalPrice = JSON.parse(sessionStorage.getItem("totalPrice"));
+      
+  if(!products || !deliveryDetails || !totalPrice){
+    console.log("The following details are missing any of these");
+  }
+const productId = products[0].productId;
+const size= products[0].size;
+const color= products[0].color;
+const count= products[0].count;
+const mobileNumber = sessionStorage.getItem("mobileNumber");
 
-      const { productId, size, color, count, deliveryDetails, mobileNumber } = pendingOrder;
+
+console.log("👉 ProductId:", productId);
+console.log("👉 Delivery Details:", deliveryDetails);
+console.log("👉 Total Price:", totalPrice);
+
+
       const userId = "user_" + Math.floor(Math.random() * 1000000);
-      const amount = pendingOrder.count * pendingOrder.Price || 100; // fallback
+      const amount = totalPrice;
       const useremail = mobileNumber;
 
       sessionStorage.setItem("userId", userId);
       sessionStorage.setItem("amount", amount);
-
+await new Promise((resolve) => setTimeout(resolve, 13000));
       try {
         const response = await client.post("/payments/start", {
           userId,
@@ -33,11 +44,13 @@ const PaymentPage = () => {
 
         if (response.data.merchantOrderId) {
           sessionStorage.setItem("merchantOrderId", response.data.merchantOrderId);
-          sessionStorage.setItem("pendingOrder", JSON.stringify({
-            ...pendingOrder,
-            merchantOrderId: response.data.merchantOrderId
-          }));
+         
         }
+
+        console.error("Payment start response:", response.data);
+      await new Promise((resolve) => setTimeout(resolve, 13000));
+
+
 
         const paymentUrl = response.data.paymentUrl;
         if (paymentUrl) window.location.href = paymentUrl;

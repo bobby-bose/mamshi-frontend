@@ -17,27 +17,23 @@ const PaymentSuccess = () => {
       const userId = sessionStorage.getItem("userId");
       const amount = sessionStorage.getItem("amount");
       let merchantOrderId = sessionStorage.getItem("merchantOrderId");
-      let phonePeTxnId = sessionStorage.getItem("phonePeTxnId");
+ 
       let email=sessionStorage.getItem("mobileNumber");
       let products = sessionStorage.getItem("products");
       let deliveryDetails = sessionStorage.getItem("deliveryDetails");
 
 
-
-
-      // ✅ If URL has an orderId, override session one
       if (orderId) {
         merchantOrderId = orderId;
       }
-
       console.log("💡 Session data before verification:", {
         userId,
         amount,
         merchantOrderId,
-        phonePeTxnId,
+       
       });
 
-      if (!userId || !amount || !merchantOrderId || !phonePeTxnId) {
+      if (!userId || !amount || !merchantOrderId) {
         console.error("❌ Missing critical session data for payment verification!");
         setStatusMessage("❌ Missing payment session data.");
         setSuccess(false);
@@ -50,7 +46,7 @@ const PaymentSuccess = () => {
           userId,
           amount,
           merchantOrderId,
-          phonePeTxnId,
+        
           email,
           products,
           deliveryDetails
