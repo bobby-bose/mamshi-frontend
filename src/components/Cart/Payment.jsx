@@ -9,7 +9,7 @@ const PaymentPage = () => {
     const startPayment = async () => {
       const products = JSON.parse(sessionStorage.getItem("products"));
       const deliveryDetails = JSON.parse(sessionStorage.getItem("deliveryDetails"));
-      const totalPrice = JSON.parse(sessionStorage.getItem("totalPrice"));
+      const totalPrice = 100;
       
   if(!products || !deliveryDetails || !totalPrice){
     console.log("The following details are missing any of these");
@@ -26,21 +26,23 @@ console.log("👉 Delivery Details:", deliveryDetails);
 console.log("👉 Total Price:", totalPrice);
 
 
-      const userId = "user_" + Math.floor(Math.random() * 1000000);
+   
       const amount = totalPrice;
       const useremail = mobileNumber;
 
-      sessionStorage.setItem("userId", userId);
+  
       sessionStorage.setItem("amount", amount);
-await new Promise((resolve) => setTimeout(resolve, 13000));
+
       try {
         const response = await client.post("/payments/start", {
-          userId,
+        
           amount,
           useremail,
           deliveryDetails,
           products: [{ productId, size, color, count }]
         });
+
+        console.log("Payment start response:", response.data);
 
         if (response.data.merchantOrderId) {
           sessionStorage.setItem("merchantOrderId", response.data.merchantOrderId);
@@ -48,7 +50,7 @@ await new Promise((resolve) => setTimeout(resolve, 13000));
         }
 
         console.error("Payment start response:", response.data);
-      await new Promise((resolve) => setTimeout(resolve, 13000));
+    
 
 
 

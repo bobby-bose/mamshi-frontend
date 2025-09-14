@@ -14,8 +14,8 @@ const PaymentSuccess = () => {
     setWindowSize({ width: window.innerWidth, height: window.innerHeight });
 
     const verifyPayment = async () => {
-      const userId = sessionStorage.getItem("userId");
-      const amount = sessionStorage.getItem("amount");
+     
+      const amount = 1
       let merchantOrderId = sessionStorage.getItem("merchantOrderId");
  
       let email = sessionStorage.getItem("mobileNumber");
@@ -23,17 +23,20 @@ const PaymentSuccess = () => {
       let deliveryDetails = sessionStorage.getItem("deliveryDetails");
 
 
+      
+
+
       if (orderId) {
         merchantOrderId = orderId;
       }
       console.log("💡 Session data before verification:", {
-        userId,
+       
         amount,
         merchantOrderId,
        
       });
 
-      if (!userId || !amount || !merchantOrderId) {
+      if ( !amount || !merchantOrderId) {
         console.error("❌ Missing critical session data for payment verification!");
         setStatusMessage("❌ Missing payment session data.");
         setSuccess(false);
@@ -43,7 +46,7 @@ const PaymentSuccess = () => {
       try {
         console.log("🔄 Sending payment verification request to backend...");
         const response = await client.post("/payments/complete", {
-          userId,
+        
           amount,
           merchantOrderId,
         

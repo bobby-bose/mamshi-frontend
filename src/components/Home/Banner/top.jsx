@@ -1,37 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import client from '../../../api/client';
+import client from '../../../api/client'; // axios instance
 
 const CounterBanner = () => {
-  const [vouchersLeft, setVouchersLeft] = useState(50000);
+  const [vouchersLeft, setVouchersLeft] = useState(null); // initialize as null
 
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const response = await client.get('/orders');
+        const response = await client.get('/giveaway');
         console.log("Vouchers data:", response.data);
 
-        // ✅ Use backend value directly
-        if (response.data.vouchersLeft !== undefined) {
-          setVouchersLeft(response.data.vouchersLeft);
-        } else {
-          setVouchersLeft(50000); // fallback if backend fails
+        if (response.data.success && response.data.seq !== undefined) {
+          const seqValue = Math.ceil(response.data.seq);
+          // Subtract seq from 50000 to get remaining vouchers
+          setVouchersLeft(Math.max(0, 50000 - seqValue));
         }
-
       } catch (error) {
         console.error("Failed to fetch vouchers:", error);
-        setVouchersLeft(50000);
+        setVouchersLeft(50000); // fallback
       }
     };
 
-    fetchVouchers(); // fetch immediately
-    const intervalId = setInterval(fetchVouchers, 1000);
+    fetchVouchers(); // initial fetch
+    const intervalId = setInterval(fetchVouchers, 5000); // refresh every 5s
     return () => clearInterval(intervalId);
   }, []);
 
-  const formatNumber = (num) => {
-    return String(Math.max(0, num)).padStart(5, '0');
-  };
+  // If vouchersLeft is not yet loaded, render nothing or a loader
+  if (vouchersLeft === null) return null;
 
+  const formatNumber = (num) => String(Math.max(0, num)).padStart(5, '0');
   const formattedVouchers = formatNumber(vouchersLeft);
 
   return (

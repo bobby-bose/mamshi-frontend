@@ -156,7 +156,7 @@ if (!mobileNumber) {
 
 
 
-const handleModalSubmit = (deliveryDetails) => {
+const handleModalSubmit =async (deliveryDetails) => {
   setDeliveryInfo(deliveryDetails);
   setIsModalOpen(false);
 
@@ -179,7 +179,8 @@ const handleModalSubmit = (deliveryDetails) => {
     deliveryDetails,
     totalPrice,
   });
-
+console.log("products", JSON.stringify([productItem]));
+ 
   navigate("/payment"); // uncomment when ready
 };
 
